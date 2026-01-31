@@ -1,9 +1,9 @@
 export interface BodyPart {
   id: string;
   name: string;
-  meshName: string;
+  meshName: string; // Name of the mesh in the 3D model
+  modelPath: string; // Path to individual body part model
   position: [number, number, number]; // Camera focus position [x, y, z]
-  diseases: string[];
   color: string; // Default color for the mesh
 }
 
@@ -13,7 +13,6 @@ export interface Disease {
   description: string;
   symptoms: string[];
   causes: string[];
-  treatments: string[];
 }
 
 export interface Treatment {
@@ -27,3 +26,12 @@ export type SelectionState = {
   bodyPart: string | null;
   disease: string | null;
 };
+
+// API Response types
+export interface DiseasesResponse {
+  diseases: Disease[];
+}
+
+export interface TreatmentsResponse {
+  treatments: Treatment[];
+}

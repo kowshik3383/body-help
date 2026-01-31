@@ -1,13 +1,13 @@
 'use client';
 
-import { treatments } from '@/data/treatments';
+import { Treatment } from '@/types/medical';
 import { Pill, Heart, Stethoscope, Scissors } from 'lucide-react';
 
 interface TreatmentListProps {
-  treatmentIds: string[];
+  treatments: Treatment[];
 }
 
-export function TreatmentList({ treatmentIds }: TreatmentListProps) {
+export function TreatmentList({ treatments }: TreatmentListProps) {
   const getTreatmentIcon = (type: string) => {
     switch (type) {
       case 'medication':
@@ -38,44 +38,47 @@ export function TreatmentList({ treatmentIds }: TreatmentListProps) {
     }
   };
 
+  if (!treatments || treatments.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-600 dark:text-gray-300">
+        No treatment information available.
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
         Treatment Options
       </h3>
       <div className="space-y-3">
-        {treatmentIds.map((treatmentId) => {
-          const treatment = treatments[treatmentId];
-          if (!treatment) return null;
-
-          return (
-            <div
-              key={treatment.id}
-              className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start gap-3">
-                <div className={`p-2 rounded-lg ${getTypeColor(treatment.type)}`}>
-                  {getTreatmentIcon(treatment.type)}
+        {treatments.map((treatment) => (
+          <div
+            key={treatment.id}
+            className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-start gap-3">
+              <div className={`p-2 rounded-lg ${getTypeColor(treatment.type)}`}>
+                {getTreatmentIcon(treatment.type)}
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-1">
+                  <h4 className="font-semibold text-gray-900 dark:text-white">
+                    {treatment.name}
+                  </h4>
+                  <span
+                    className={`text-xs px-2 py-1 rounded-full ${getTypeColor(treatment.type)}`}
+                  >
+                    {treatment.type}
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-semibold text-gray-900 dark:text-white">
-                      {treatment.name}
-                    </h4>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${getTypeColor(treatment.type)}`}
-                    >
-                      {treatment.type}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
-                    {treatment.description}
-                  </p>
-                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {treatment.description}
+                </p>
               </div>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
