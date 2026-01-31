@@ -1,0 +1,60 @@
+import { BodyPart } from '@/types/medical';
+
+export const bodyParts: Record<string, BodyPart> = {
+  skull: {
+    id: 'skull',
+    name: 'Skull',
+    meshName: 'skull',
+    position: [0, 1.5, 0],
+    diseases: ['migraine', 'concussion', 'sinusitis'],
+    color: '#e8e6e3',
+  },
+  spine: {
+    id: 'spine',
+    name: 'Spine',
+    meshName: 'spine',
+    position: [0, 0.5, 0],
+    diseases: ['herniatedDisc', 'scoliosis', 'spinalStenosis'],
+    color: '#e8e6e3',
+  },
+  leftKnee: {
+    id: 'leftKnee',
+    name: 'Left Knee',
+    meshName: 'leftKnee',
+    position: [-0.2, -0.8, 0],
+    diseases: ['aclTear', 'kneeArthritis', 'bursitis'],
+    color: '#e8e6e3',
+  },
+  rightKnee: {
+    id: 'rightKnee',
+    name: 'Right Knee',
+    meshName: 'rightKnee',
+    position: [0.2, -0.8, 0],
+    diseases: ['aclTear', 'kneeArthritis', 'bursitis'],
+    color: '#e8e6e3',
+  },
+  leftShoulder: {
+    id: 'leftShoulder',
+    name: 'Left Shoulder',
+    meshName: 'leftShoulder',
+    position: [-0.4, 1.1, 0],
+    diseases: ['rotatorCuffTear', 'frozenShoulder'],
+    color: '#e8e6e3',
+  },
+  rightShoulder: {
+    id: 'rightShoulder',
+    name: 'Right Shoulder',
+    meshName: 'rightShoulder',
+    position: [0.4, 1.1, 0],
+    diseases: ['rotatorCuffTear', 'frozenShoulder'],
+    color: '#e8e6e3',
+  },
+  ribs: {
+    id: 'ribs',
+    name: 'Ribs',
+    meshName: 'ribs',
+    position: [0, 0.8, 0],
+    diseases: ['fracturedRib', 'costochondritis'],
+    color: '#e8e6e3',
+  },
+};
