@@ -4,9 +4,12 @@ import { SkeletonViewer } from '../src/components/SkeletonViewer';
 import { useRouter } from 'next/navigation';
 import { Info } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
+import { LanguageSelector } from '@/src/components/LanguageSelector';
 
 export default function Home() {
   const router = useRouter();
+  const { content } = useLanguage();
   const [selectedBodyPart, setSelectedBodyPart] = useState<string | null>(null);
 
   const handleSelectBodyPart = (bodyPartId: string) => {
@@ -28,6 +31,7 @@ export default function Home() {
               Interactive 3D Medical Visualization
             </p>
           </div>
+          <LanguageSelector />
         </div>
       </header>
 
@@ -37,11 +41,10 @@ export default function Home() {
           <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-              Getting Started
+              {content.ui.gettingStarted}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Click on any body part to explore AI-powered medical insights. 
-              Use your mouse to rotate, zoom, and pan the 3D skeleton.
+              {content.ui.gettingStartedDesc}
             </p>
           </div>
         </div>

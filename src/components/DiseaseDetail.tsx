@@ -3,6 +3,8 @@
 import { Disease, Treatment } from '@/src/types/medical';
 import { TreatmentList } from './TreatmentList';
 import { Activity, AlertCircle, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
+import { SpeechButton } from './SpeechButton';
 
 interface DiseaseDetailProps {
   disease: Disease;
@@ -11,13 +13,26 @@ interface DiseaseDetailProps {
 }
 
 export function DiseaseDetail({ disease, treatments, loadingTreatments }: DiseaseDetailProps) {
+  const { content } = useLanguage();
+
+  // Prepare speech content
+  const diseaseContent = `
+    ${disease.name}. 
+    ${disease.description}
+    ${content.ui.symptoms}: ${disease.symptoms.join(', ')}.
+    ${disease.causes && disease.causes.length > 0 ? `${content.ui.causes}: ${disease.causes.join(', ')}.` : ''}
+  `;
+
   return (
     <div className="space-y-6">
-      {/* Disease name */}
+      {/* Disease name and description */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {disease.name}
-        </h2>
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {disease.name}
+          </h2>
+          <SpeechButton text={diseaseContent} className="flex-shrink-0" />
+        </div>
         <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
           {disease.description}
         </p>
@@ -28,7 +43,7 @@ export function DiseaseDetail({ disease, treatments, loadingTreatments }: Diseas
         <div className="flex items-center gap-2 mb-3">
           <Activity className="w-5 h-5 text-red-600 dark:text-red-400" />
           <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">
-            Symptoms
+            {content.ui.symptoms}
           </h3>
         </div>
         <ul className="space-y-2">
@@ -50,7 +65,7 @@ export function DiseaseDetail({ disease, treatments, loadingTreatments }: Diseas
           <div className="flex items-center gap-2 mb-3">
             <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
-              Common Causes
+              {content.ui.causes}
             </h3>
           </div>
           <ul className="space-y-2">

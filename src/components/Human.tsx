@@ -1,7 +1,9 @@
 "use client"
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 const Human = () => {
+	const router = useRouter();
 	const [hoveredPart, setHoveredPart] = useState("");
 
 	const bodyParts = [
@@ -9,6 +11,10 @@ const Human = () => {
 		'left-shoulder', 'left-arm', 'left-hand', 'abdomen', 'right-leg', 'right-foot',
 		'left-leg', 'left-foot'
 	];
+
+	const handlePartClick = (partId: string) => {
+		router.push(`/body-part/${partId}`);
+	};
 
 	return (
 		<div className="human-wrapper">
@@ -34,37 +40,43 @@ const Human = () => {
 			<div className="human-body">
 
 				<svg id="head" width="80.3" height="100" viewBox="0 0 181 250" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('head')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('head')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('head')}>
 					<path d="M12.6756 53L11.663 110.643L0 109.49L3 142L18.663 148L30.6756 198L62.6756 250H120.676L156.676 198L164.676 143L178.676 132L180.676 103L169.676 104L168.676 49.0808C168.676 49.0808 125.105 -0.230752 88.6756 0.999954C52.7339 2.21418 12.6756 53 12.6756 53Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="orbit" width="40" height="10" viewBox="0 0 96 20" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('orbit')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('orbit')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('orbit')}>
 					<ellipse cx="15" cy="10" rx="15" ry="10" fill="#EEEEEE" />
 					<ellipse cx="81" cy="10" rx="15" ry="10" fill="#EEEEEE" />
 				</svg>
 
 				<svg id="neck" width="70" height="80" viewBox="0 0 149 126" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('neck')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('neck')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('neck')}>
 					<path d="M10.2703 0L52.2973 53.9L76 126L28.7568 111.3L0 27.3L10.2703 0Z" fill="#D9D9D9" />
 					<path d="M142 0L149 16L126 98L82 126L96 56L142 0Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="chest" width="150" height="80" viewBox="0 0 289 165" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('chest')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('chest')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('chest')}>
 					<path d="M53 0L114 13L132 121L71 165L23 148V97L0 70L35 55L53 0Z" fill="#D9D9D9" />
 					<path d="M221 0L252 50.2069H289L277 76V128L227 162L160.407 116L166.407 10.2069L221 0Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="right-shoulder" width="75" height="110" viewBox="0 0 154 218" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('right-shoulder')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('right-shoulder')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('right-shoulder')}>
 					<path d="M135 0L154 52H105L73 36L135 0Z" fill="#D9D9D9" />
 					<path d="M35 51H53.916L0 151.214V107L35 51Z" fill="#D9D9D9" />
 					<path d="M58.916 55.2145H99.916L74.916 142.214L35.916 165.214L4.91602 217.214V155.214L58.916 55.2145Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="right-arm" width="100" height="190" viewBox="0 0 223 445" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('right-arm')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('right-arm')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('right-arm')}>
 					<path d="M193 0L223 42L183 167L104 200V181L160 48L193 0Z" fill="#D9D9D9" />
 					<path d="M144 14L98 191L110 69L144 14Z" fill="#D9D9D9" />
 					<path d="M181 175L172 203L106 242V212L181 175Z" fill="#D9D9D9" />
@@ -73,19 +85,22 @@ const Human = () => {
 				</svg>
 
 				<svg id="right-hand" width="60" height="90" viewBox="0 0 127 170" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('right-hand')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('right-hand')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('right-hand')}>
 					<path d="M70 0L85 27L123 32C123 32 124.421 62.7655 126 83C128.63 116.709 111 170 111 170H100L107 131L96 126L83 167L70 165L81 119L72 113L55 158L41 157L58 106L49 101L27 151L17 149L41 66L37 53L6 73L0 66L27 27L70 0Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="left-shoulder" width="100" height="110" viewBox="0 0 193 210" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('left-shoulder')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('left-shoulder')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('left-shoulder')}>
 					<path d="M87 65L185 141L193 210L163 173L113 155L53 101L87 65Z" fill="#D9D9D9" />
 					<path d="M111 48L179 106L191 141L93 57L111 48Z" fill="#D9D9D9" />
 					<path d="M11 0L95 50L63 64L0 50L11 0Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="left-arm" width="100" height="190" viewBox="0 0 206 438" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('left-arm')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('left-arm')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('left-arm')}>
 					<path d="M30 0L0 42L40 167L119 200V181L63 48L30 0Z" fill="#D9D9D9" />
 					<path d="M78 35L126 173L113 63L78 35Z" fill="#D9D9D9" />
 					<path d="M41 178L50 206L116 245V215L41 178Z" fill="#D9D9D9" />
@@ -94,12 +109,14 @@ const Human = () => {
 				</svg>
 
 				<svg id="left-hand" width="60" height="170" viewBox="0 0 127 170" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('left-hand')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('left-hand')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('left-hand')}>
 					<path d="M56.2675 0L41.2675 27L2.26746 36C2.26746 36 1.84616 62.7655 0.267456 83C-2.36253 116.709 15.2675 170 15.2675 170H26.2675L19.2675 131L30.2675 126L43.2675 167L56.2675 165L45.2675 119L54.2675 113L71.2675 158L85.2675 157L68.2675 106L77.2675 101L99.2675 151L109.267 149L85.2675 66L89.2675 53L120.267 73L126.267 66L99.2675 27L56.2675 0Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="abdomen" width="180" height="230" viewBox="0 0 293 420" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('abdomen')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('abdomen')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('abdomen')}>
 					<path d="M129 11L128 54L77 85V41L129 11Z" fill="#D9D9D9" />
 					<path d="M128 73V127L76 136V105L128 73Z" fill="#D9D9D9" />
 					<path d="M127 139L126 217L81 194V153L127 139Z" fill="#D9D9D9" />
@@ -135,7 +152,8 @@ const Human = () => {
 				</svg>
 
 				<svg id="right-leg" width="162" height="350" viewBox="0 0 162 756" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('right-leg')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('right-leg')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('right-leg')}>
 					<path d="M23.0673 0L33 97.5L0 299.5V162L23.0673 0Z" fill="#D9D9D9" />
 					<path d="M38 3.5L151 176V252L117 164L41 85.5L38 3.5Z" fill="#D9D9D9" />
 					<path d="M40 100.5L95 190L121 290.5L107 384L52 290.5L30 176.5L40 100.5Z" fill="#D9D9D9" />
@@ -151,12 +169,14 @@ const Human = () => {
 				</svg>
 
 				<svg id="right-foot" width="60" height="50" viewBox="0 0 86 90" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('right-foot')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('right-foot')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('right-foot')}>
 					<path d="M68 0L86 30L80 90H68L64 78L59 90L5 88L0 69L22 22L68 0Z" fill="#D9D9D9" />
 				</svg>
 
 				<svg id="left-leg" width="156" height="350" viewBox="0 0 156 769" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('left-leg')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('left-leg')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('left-leg')}>
 					<path d="M132.933 0L123 97.5L146 302L156 172L132.933 0Z" fill="#D9D9D9" />
 					<path d="M114 24L11 208L4 304.5L38 216.5L114 112V24Z" fill="#D9D9D9" />
 					<path d="M114 127L55 210.5L29 311L43 404.5L98 311L120 197L114 127Z" fill="#D9D9D9" />
@@ -172,7 +192,8 @@ const Human = () => {
 				</svg>
 
 				<svg id="left-foot" width="60" height="50" viewBox="0 0 86 90" fill="none" xmlns="http://www.w3.org/2000/svg"
-					onMouseEnter={() => setHoveredPart('left-foot')} onMouseLeave={() => setHoveredPart("")}>
+					onMouseEnter={() => setHoveredPart('left-foot')} onMouseLeave={() => setHoveredPart("")}
+					onClick={() => handlePartClick('left-foot')}>
 					<path d="M18 0L0 30L6 90H18L22 78L27 90L81 88L86 69L64 22L18 0Z" fill="#D9D9D9" />
 				</svg>
 
