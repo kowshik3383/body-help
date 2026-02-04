@@ -1,75 +1,209 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* =====================
    CSS VARIABLES
 ===================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+	--background: #ffffff;
+	--foreground: #171717;
 
-  /* Medical visualization colors */
-  --color-skeleton: #e8e6e3;
-  --color-skeleton-dark: #d1cfc9;
-  --color-highlight: #3b82f6;
-  --color-hover: #60a5fa;
-  --color-panel-bg: rgba(255, 255, 255, 0.95);
-  --color-accent: #10b981;
+	/* Medical visualization colors */
+	--color-skeleton: #e8e6e3;
+	--color-skeleton-dark: #d1cfc9;
+	--color-highlight: #3b82f6;
+	--color-hover: #60a5fa;
+	--color-panel-bg: rgba(255, 255, 255, 0.95);
+	--color-accent: #10b981;
 }
 
 /* =====================
    TAILWIND THEME TOKENS
 ===================== */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 
-  --color-skeleton: var(--color-skeleton);
-  --color-skeleton-dark: var(--color-skeleton-dark);
-  --color-highlight: var(--color-highlight);
-  --color-hover: var(--color-hover);
-  --color-panel-bg: var(--color-panel-bg);
-  --color-accent: var(--color-accent);
+	--color-skeleton: var(--color-skeleton);
+	--color-skeleton-dark: var(--color-skeleton-dark);
+	--color-highlight: var(--color-highlight);
+	--color-hover: var(--color-hover);
+	--color-panel-bg: var(--color-panel-bg);
+	--color-accent: var(--color-accent);
 }
 
 /* =====================
    DARK MODE
 ===================== */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --color-panel-bg: rgba(17, 24, 39, 0.95);
-  }
+	:root {
+		--background: #0a0a0a;
+		--foreground: #ededed;
+		--color-panel-bg: rgba(17, 24, 39, 0.95);
+	}
 }
 
 /* =====================
    BASE STYLES
 ===================== */
 @layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
 
-  body {
-    background: var(--background);
-    color: var(--foreground);
-    font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-    overflow: hidden;
-  }
+	body {
+		background: var(--background);
+		color: var(--foreground);
+		font-family:
+			var(--font-geist-sans),
+			system-ui,
+			-apple-system,
+			sans-serif;
+		overflow: hidden;
+	}
 }
 
 /* =====================
    UTILITIES (TOP LEVEL)
 ===================== */
 @utility line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+.human-wrapper {
+	width: 100%;
+	max-width: 420px;
+	margin: 0 auto;
+	display: flex;
+	justify-content: center;
+
+	overflow: visible; /* 👈 important */
+}
+
+.human-body {
+	position: relative;
+	display: block;
+	margin: 30px auto;
+
+	width: 100%;
+	height: 120px; /* 👈 REQUIRED (must exceed lowest SVG top) */
+}
+@media (min-width: 1024px) {
+	.human-body {
+		transform: scale(0.7);
+		transform-origin: top center;
+	}
+}
+
+@media (max-width: 480px) {
+	.human-body {
+		transform: scale(0.7);
+	}
+}
+
+@media (max-width: 380px) {
+	.human-body {
+		transform: scale(0.6);
+	}
+}
+
+.human-body svg:hover {
+	cursor: pointer;
+}
+
+.human-body svg:hover path {
+	fill: #f14d49;
+}
+
+.human-body svg {
+	position: absolute;
+	left: 50%;
+}
+
+.human-body svg#head {
+	margin-left: -27px;
+	top: -6px;
+}
+
+.human-body svg#orbit {
+	margin-left: -6px;
+	top: 27px;
+}
+
+.human-body svg#neck {
+	margin-left: -21px;
+	top: 70px;
+}
+
+.human-body svg#chest {
+	margin-left: -57px;
+	top: 140px;
+}
+
+.human-body svg#right-shoulder {
+	margin-left: -90px;
+	top: 100px;
+}
+
+.human-body svg#right-arm {
+	margin-left: -162px;
+	top: 210px;
+}
+
+.human-body svg#right-hand {
+	margin-left: -197px;
+	top: 387px;
+}
+
+.human-body svg#left-shoulder {
+	margin-left: 48px;
+	top: 95px;
+}
+
+.human-body svg#left-arm {
+	margin-left: 100px;
+	top: 202px;
+}
+
+.human-body svg#left-hand {
+	margin-left: 172px;
+	top: 336px;
+}
+
+.human-body svg#abdomen {
+	margin-left: -70px;
+	top: 210px;
+}
+
+.human-body svg#right-leg {
+	margin-left: -110px;
+	top: 420px;
+	z-index: 9999;
+}
+
+.human-body svg#right-foot {
+	margin-left: -70px;
+	top: 773px;
+}
+
+.human-body svg#left-leg {
+	margin-left: -10px;
+	top: 415px;
+	z-index: 9999;
+}
+
+.human-body svg#left-foot {
+	margin-left: 40px;
+	top: 771px;
+}
+
+.human-body svg:hover ellipse {
+	fill: #f14d49;
 }

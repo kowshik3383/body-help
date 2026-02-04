@@ -1,6 +1,6 @@
 'use client';
 
-import { SkeletonViewer } from './components/SkeletonViewer';
+import { SkeletonViewer } from '../src/components/SkeletonViewer';
 import { useRouter } from 'next/navigation';
 import { Info } from 'lucide-react';
 import { useState } from 'react';

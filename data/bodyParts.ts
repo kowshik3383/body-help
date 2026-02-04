@@ -1,4 +1,4 @@
-import { BodyPart } from '@/types/medical';
+import { BodyPart } from '@/src/types/medical';
 
 export const bodyParts: Record<string, BodyPart> = {
   skull: {
@@ -62,13 +62,13 @@ export const bodyParts: Record<string, BodyPart> = {
 // Helper function to get mesh name variants for flexible matching
 export function getMeshNameVariants(bodyPartId: string): string[] {
   const variants: Record<string, string[]> = {
-    skull: ['Skull', 'Head', 'Cranium', 'skull', 'head', 'cranium'],
-    spine: ['Spine', 'Vertebrae', 'SpinalColumn', 'spine', 'vertebrae', 'spinal_column'],
-    leftKnee: ['LeftKnee', 'KneeLeft', 'L_Knee', 'left_knee', 'knee_left', 'Knee_L'],
-    rightKnee: ['RightKnee', 'KneeRight', 'R_Knee', 'right_knee', 'knee_right', 'Knee_R'],
-    leftShoulder: ['LeftShoulder', 'ShoulderLeft', 'L_Shoulder', 'left_shoulder', 'shoulder_left', 'Shoulder_L'],
-    rightShoulder: ['RightShoulder', 'ShoulderRight', 'R_Shoulder', 'right_shoulder', 'shoulder_right', 'Shoulder_R'],
-    ribs: ['Ribs', 'RibCage', 'Thorax', 'ribs', 'rib_cage', 'thorax'],
+    skull: ['Skull', ],
+    spine: ['Spine'],
+    leftKnee: ['LeftKnee'],
+    rightKnee: ['RightKnee'],
+    leftShoulder: ['LeftShoulder', ],
+    rightShoulder: ['RightShoulder', ],
+    ribs: ['Ribs',]
   };
 
   return variants[bodyPartId] || [bodyParts[bodyPartId]?.meshName];

@@ -1,6 +1,6 @@
 'use client';
 
-import { Disease, Treatment } from '@/types/medical';
+import { Disease, Treatment } from '@/src/types/medical';
 import { TreatmentList } from './TreatmentList';
 import { Activity, AlertCircle, Loader2 } from 'lucide-react';
 

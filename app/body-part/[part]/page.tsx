@@ -2,11 +2,11 @@
 
 import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { BodyPartModel } from '@/app/components/BodyPartModel';
+import { BodyPartModel } from '@/src/components/BodyPartModel';
 import { bodyParts } from '@/data/bodyParts';
-import { Disease, Treatment } from '@/types/medical';
+import { Disease, Treatment } from '@/src/types/medical';
 import { ChevronLeft, Loader2 } from 'lucide-react';
-import { DiseaseDetail } from '@/app/components/DiseaseDetail';
+import { DiseaseDetail } from '@/src/components/DiseaseDetail';
 
 interface BodyPartPageProps {
   params: Promise<{ part: string }>;
@@ -27,31 +27,33 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
   useEffect(() => {
     if (!bodyPart) return;
 
-    // Fetch diseases for this body part
+    const controller = new AbortController();
+
     const fetchDiseases = async () => {
       try {
         setLoadingDiseases(true);
-        setError(null);
-        
-        const response = await fetch(`/api/diseases?bodyPart=${encodeURIComponent(bodyPart.name)}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch diseases');
-        }
+        const response = await fetch(
+          `/api/diseases?bodyPart=${encodeURIComponent(bodyPart.name)}`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) throw new Error('Failed to fetch diseases');
 
         const data = await response.json();
         setDiseases(data.diseases || []);
-      } catch (err) {
-        console.error('Error fetching diseases:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load diseases');
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          console.error('Error fetching diseases:', err);
+          setError(err.message);
+        }
       } finally {
         setLoadingDiseases(false);
       }
     };
 
     fetchDiseases();
+    return () => controller.abort(); // Cleanup prevents state updates on unmounted components
   }, [bodyPart]);
-
   useEffect(() => {
     if (!selectedDisease) {
       setTreatments([]);
@@ -62,9 +64,9 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
     const fetchTreatments = async () => {
       try {
         setLoadingTreatments(true);
-        
+
         const response = await fetch(`/api/treatments?disease=${encodeURIComponent(selectedDisease.name)}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch treatments');
         }
@@ -172,8 +174,7 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
                       key={disease.id}
                       onClick={() => setSelectedDisease(disease)}
                       className="w-full text-left bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md transition-all"
-                    >
-                      <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                    >  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
                         {disease.name}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">

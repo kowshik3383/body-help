@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { SelectionState } from '@/types/medical';
+import { SelectionState } from '@/src/types/medical';
 
 export function useSelection() {
   const [selection, setSelection] = useState<SelectionState>({

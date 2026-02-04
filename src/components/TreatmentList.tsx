@@ -1,6 +1,6 @@
 'use client';
 
-import { Treatment } from '@/types/medical';
+import { Treatment } from '@/src/types/medical';
 import { Pill, Heart, Stethoscope, Scissors } from 'lucide-react';
 
 interface TreatmentListProps {
