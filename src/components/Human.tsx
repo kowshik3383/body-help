@@ -16,24 +16,18 @@ const Human = () => {
 		router.push(`/body-part/${partId}`);
 	};
 
+	// Format part name for display
+	const formatPartName = (part: string) => {
+		return part.split('-').map(word => 
+			word.charAt(0).toUpperCase() + word.slice(1)
+		).join(' ');
+	};
+
 	return (
 		<div className="human-wrapper">
 			{hoveredPart && (
-				<div style={{
-					position: 'fixed',
-					top: '10px',
-					left: '50%',
-					transform: 'translateX(-50%)',
-					background: 'rgba(0, 0, 0, 0.8)',
-					color: 'white',
-					padding: '8px 16px',
-					borderRadius: '4px',
-					zIndex: 1000,
-					pointerEvents: 'none',
-					fontSize: '14px',
-					fontWeight: 'bold'
-				}}>
-					{hoveredPart}
+				<div className="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900/90 dark:bg-gray-800/90 text-white px-4 py-2 rounded-lg z-50 pointer-events-none text-sm font-semibold shadow-lg backdrop-blur-sm border border-gray-700">
+					{formatPartName(hoveredPart)}
 				</div>
 			)}
 

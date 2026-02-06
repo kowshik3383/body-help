@@ -4,33 +4,22 @@
    CSS VARIABLES
 ===================== */
 :root {
+	/* Base colors - white/black theme */
 	--background: #ffffff;
 	--foreground: #171717;
+	--surface: #f9fafb;
+	--border: #e5e7eb;
 
-	/* Medical visualization colors */
+	/* Theme colors - dynamically set by ThemeContext */
+	--color-primary: #3b82f6;
+	--color-secondary: #0ea5e9;
+	--color-accent: #06b6d4;
+	--color-hover: #60a5fa;
+	--color-surface: #eff6ff;
+
+	/* Medical visualization */
 	--color-skeleton: #e8e6e3;
 	--color-skeleton-dark: #d1cfc9;
-	--color-highlight: #3b82f6;
-	--color-hover: #60a5fa;
-	--color-panel-bg: rgba(255, 255, 255, 0.95);
-	--color-accent: #10b981;
-}
-
-/* =====================
-   TAILWIND THEME TOKENS
-===================== */
-@theme inline {
-	--color-background: var(--background);
-	--color-foreground: var(--foreground);
-	--font-sans: var(--font-geist-sans);
-	--font-mono: var(--font-geist-mono);
-
-	--color-skeleton: var(--color-skeleton);
-	--color-skeleton-dark: var(--color-skeleton-dark);
-	--color-highlight: var(--color-highlight);
-	--color-hover: var(--color-hover);
-	--color-panel-bg: var(--color-panel-bg);
-	--color-accent: var(--color-accent);
 }
 
 /* =====================
@@ -38,10 +27,36 @@
 ===================== */
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-		--color-panel-bg: rgba(17, 24, 39, 0.95);
+		--background: #030712;
+		--foreground: #f9fafb;
+		--surface: #111827;
+		--border: #1f2937;
 	}
+}
+
+/* =====================
+   TAILWIND THEME TOKENS
+===================== */
+@theme inline {
+	/* Base tokens */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-surface: var(--surface);
+	--color-border: var(--border);
+
+	/* Theme tokens */
+	--color-primary: var(--color-primary);
+	--color-secondary: var(--color-secondary);
+	--color-accent: var(--color-accent);
+	--color-hover: var(--color-hover);
+
+	/* Font families */
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
+
+	/* Medical colors */
+	--color-skeleton: var(--color-skeleton);
+	--color-skeleton-dark: var(--color-skeleton-dark);
 }
 
 /* =====================
@@ -56,6 +71,11 @@
 		padding: 0;
 	}
 
+	html {
+		height: 100%;
+		-webkit-text-size-adjust: 100%;
+	}
+
 	body {
 		background: var(--background);
 		color: var(--foreground);
@@ -64,12 +84,44 @@
 			system-ui,
 			-apple-system,
 			sans-serif;
-		overflow: hidden;
+		min-height: 100%;
+		line-height: 1.5;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	/* Scrollbar styling */
+	::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: var(--surface);
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: #cbd5e1;
+		border-radius: 4px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #94a3b8;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		::-webkit-scrollbar-thumb {
+			background: #475569;
+		}
+
+		::-webkit-scrollbar-thumb:hover {
+			background: #64748b;
+		}
 	}
 }
 
 /* =====================
-   UTILITIES (TOP LEVEL)
+   UTILITIES
 ===================== */
 @utility line-clamp-2 {
 	overflow: hidden;
@@ -77,56 +129,81 @@
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 }
+
+@utility line-clamp-3 {
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+}
+
+/* =====================
+   HUMAN COMPONENT STYLES
+===================== */
 .human-wrapper {
 	width: 100%;
-	max-width: 420px;
+	max-width: 500px;
 	margin: 0 auto;
 	display: flex;
 	justify-content: center;
-
-	overflow: visible; /* 👈 important */
+	overflow: visible;
+	padding: 2rem 1rem;
 }
 
 .human-body {
 	position: relative;
 	display: block;
 	margin: 30px auto;
-
 	width: 100%;
-	height: 120px; /* 👈 REQUIRED (must exceed lowest SVG top) */
+	height: 850px;
+	transform-origin: top center;
 }
-@media (min-width: 1024px) {
+
+/* Responsive scaling */
+@media (max-width: 640px) {
+	.human-wrapper {
+		padding: 1rem 0.5rem;
+	}
+
 	.human-body {
 		transform: scale(0.7);
-		transform-origin: top center;
+		height: 650px;
 	}
 }
 
-@media (max-width: 480px) {
+@media (min-width: 641px) and (max-width: 1024px) {
 	.human-body {
-		transform: scale(0.7);
+		transform: scale(0.85);
+		height: 750px;
 	}
 }
 
-@media (max-width: 380px) {
+@media (min-width: 1025px) {
 	.human-body {
-		transform: scale(0.6);
+		transform: scale(1);
 	}
 }
 
-.human-body svg:hover {
-	cursor: pointer;
-}
-
-.human-body svg:hover path {
-	fill: #f14d49;
-}
-
+/* SVG interactions */
 .human-body svg {
 	position: absolute;
 	left: 50%;
+	transition: all 0.2s ease;
+	cursor: pointer;
 }
 
+.human-body svg:hover path,
+.human-body svg:hover ellipse {
+	fill: var(--color-primary);
+	filter: brightness(1.1);
+}
+
+.human-body svg:active path,
+.human-body svg:active ellipse {
+	fill: var(--color-hover);
+}
+
+/* SVG positioning */
 .human-body svg#head {
 	margin-left: -27px;
 	top: -6px;
@@ -185,7 +262,7 @@
 .human-body svg#right-leg {
 	margin-left: -110px;
 	top: 420px;
-	z-index: 9999;
+	z-index: 10;
 }
 
 .human-body svg#right-foot {
@@ -196,7 +273,7 @@
 .human-body svg#left-leg {
 	margin-left: -10px;
 	top: 415px;
-	z-index: 9999;
+	z-index: 10;
 }
 
 .human-body svg#left-foot {
@@ -204,6 +281,64 @@
 	top: 771px;
 }
 
-.human-body svg:hover ellipse {
-	fill: #f14d49;
+/* =====================
+   COMPONENT UTILITIES
+===================== */
+
+/* Smooth transitions */
+.transition-smooth {
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus ring */
+.focus-ring {
+	@apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+}
+
+/* Card styles */
+.card {
+	@apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg shadow-sm;
+}
+
+.card-hover {
+	@apply hover:shadow-md hover:border-primary dark:hover:border-primary ;
+}
+
+/* Container */
+.container {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+	.container {
+		max-width: 640px;
+	}
+}
+
+@media (min-width: 768px) {
+	.container {
+		max-width: 768px;
+	}
+}
+
+@media (min-width: 1024px) {
+	.container {
+		max-width: 1024px;
+	}
+}
+
+@media (min-width: 1280px) {
+	.container {
+		max-width: 1280px;
+	}
+}
+
+@media (min-width: 1536px) {
+	.container {
+		max-width: 1536px;
+	}
 }

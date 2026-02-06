@@ -27,10 +27,11 @@ export function LanguageSelector() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary transition-colors"
+        aria-label="Select language"
       >
         <Languages className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-        <span className="text-sm font-medium text-gray-900 dark:text-white">
+        <span className="hidden sm:inline text-sm font-medium text-gray-900 dark:text-white">
           {content.nativeName}
         </span>
       </button>
@@ -53,7 +54,7 @@ export function LanguageSelector() {
                 }}
                 className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                   language === code
-                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+                    ? 'bg-surface dark:bg-gray-700 text-primary font-medium'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >

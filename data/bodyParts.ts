@@ -1,10 +1,132 @@
 import { BodyPart } from '@/src/types/medical';
 
+// Body parts mapping - corresponds to parts in Human component
 export const bodyParts: Record<string, BodyPart> = {
+  head: {
+    id: 'head',
+    name: 'Head',
+    meshName: 'Head',
+    modelPath: '/models/parts/skull.glb',
+    position: [0, 1.5, 0],
+    color: '#e8e6e3',
+  },
+  orbit: {
+    id: 'orbit',
+    name: 'Eyes / Orbit',
+    meshName: 'Orbit',
+    modelPath: '/models/parts/orbit.glb',
+    position: [0, 1.4, 0],
+    color: '#e8e6e3',
+  },
+  neck: {
+    id: 'neck',
+    name: 'Neck',
+    meshName: 'Neck',
+    modelPath: '/models/parts/neck.glb',
+    position: [0, 1.2, 0],
+    color: '#e8e6e3',
+  },
+  chest: {
+    id: 'chest',
+    name: 'Chest',
+    meshName: 'Chest',
+    modelPath: '/models/parts/chest.glb',
+    position: [0, 0.8, 0],
+    color: '#e8e6e3',
+  },
+  'right-shoulder': {
+    id: 'right-shoulder',
+    name: 'Right Shoulder',
+    meshName: 'RightShoulder',
+    modelPath: '/models/parts/right-shoulder.glb',
+    position: [0.4, 1.1, 0],
+    color: '#e8e6e3',
+  },
+  'right-arm': {
+    id: 'right-arm',
+    name: 'Right Arm',
+    meshName: 'RightArm',
+    modelPath: '/models/parts/right-arm.glb',
+    position: [0.5, 0.5, 0],
+    color: '#e8e6e3',
+  },
+  'right-hand': {
+    id: 'right-hand',
+    name: 'Right Hand',
+    meshName: 'RightHand',
+    modelPath: '/models/parts/right-hand.glb',
+    position: [0.6, -0.2, 0],
+    color: '#e8e6e3',
+  },
+  'left-shoulder': {
+    id: 'left-shoulder',
+    name: 'Left Shoulder',
+    meshName: 'LeftShoulder',
+    modelPath: '/models/parts/left-shoulder.glb',
+    position: [-0.4, 1.1, 0],
+    color: '#e8e6e3',
+  },
+  'left-arm': {
+    id: 'left-arm',
+    name: 'Left Arm',
+    meshName: 'LeftArm',
+    modelPath: '/models/parts/left-arm.glb',
+    position: [-0.5, 0.5, 0],
+    color: '#e8e6e3',
+  },
+  'left-hand': {
+    id: 'left-hand',
+    name: 'Left Hand',
+    meshName: 'LeftHand',
+    modelPath: '/models/parts/left-hand.glb',
+    position: [-0.6, -0.2, 0],
+    color: '#e8e6e3',
+  },
+  abdomen: {
+    id: 'abdomen',
+    name: 'Abdomen',
+    meshName: 'Abdomen',
+    modelPath: '/models/parts/abdomen.glb',
+    position: [0, 0.2, 0],
+    color: '#e8e6e3',
+  },
+  'right-leg': {
+    id: 'right-leg',
+    name: 'Right Leg',
+    meshName: 'RightLeg',
+    modelPath: '/models/parts/right-leg.glb',
+    position: [0.2, -0.6, 0],
+    color: '#e8e6e3',
+  },
+  'right-foot': {
+    id: 'right-foot',
+    name: 'Right Foot',
+    meshName: 'RightFoot',
+    modelPath: '/models/parts/right-foot.glb',
+    position: [0.2, -1.4, 0],
+    color: '#e8e6e3',
+  },
+  'left-leg': {
+    id: 'left-leg',
+    name: 'Left Leg',
+    meshName: 'LeftLeg',
+    modelPath: '/models/parts/left-leg.glb',
+    position: [-0.2, -0.6, 0],
+    color: '#e8e6e3',
+  },
+  'left-foot': {
+    id: 'left-foot',
+    name: 'Left Foot',
+    meshName: 'LeftFoot',
+    modelPath: '/models/parts/left-foot.glb',
+    position: [-0.2, -1.4, 0],
+    color: '#e8e6e3',
+  },
+  // Legacy body parts (for backward compatibility with SkeletonViewer)
   skull: {
     id: 'skull',
     name: 'Skull',
-    meshName: 'Skull', // Will try variants: Skull, Head, Cranium
+    meshName: 'Skull',
     modelPath: '/models/parts/skull.glb',
     position: [0, 1.5, 0],
     color: '#e8e6e3',
@@ -12,7 +134,7 @@ export const bodyParts: Record<string, BodyPart> = {
   spine: {
     id: 'spine',
     name: 'Spine',
-    meshName: 'Spine', // Will try variants: Spine, Vertebrae, SpinalColumn
+    meshName: 'Spine',
     modelPath: '/models/parts/spine.glb',
     position: [0, 0.5, 0],
     color: '#e8e6e3',
@@ -20,7 +142,7 @@ export const bodyParts: Record<string, BodyPart> = {
   leftKnee: {
     id: 'leftKnee',
     name: 'Left Knee',
-    meshName: 'LeftKnee', // Will try variants: LeftKnee, KneeLeft, L_Knee
+    meshName: 'LeftKnee',
     modelPath: '/models/parts/leftKnee.glb',
     position: [-0.2, -0.8, 0],
     color: '#e8e6e3',
@@ -28,7 +150,7 @@ export const bodyParts: Record<string, BodyPart> = {
   rightKnee: {
     id: 'rightKnee',
     name: 'Right Knee',
-    meshName: 'RightKnee', // Will try variants: RightKnee, KneeRight, R_Knee
+    meshName: 'RightKnee',
     modelPath: '/models/parts/rightKnee.glb',
     position: [0.2, -0.8, 0],
     color: '#e8e6e3',
@@ -36,7 +158,7 @@ export const bodyParts: Record<string, BodyPart> = {
   leftShoulder: {
     id: 'leftShoulder',
     name: 'Left Shoulder',
-    meshName: 'LeftShoulder', // Will try variants: LeftShoulder, ShoulderLeft, L_Shoulder
+    meshName: 'LeftShoulder',
     modelPath: '/models/parts/leftShoulder.glb',
     position: [-0.4, 1.1, 0],
     color: '#e8e6e3',
@@ -44,7 +166,7 @@ export const bodyParts: Record<string, BodyPart> = {
   rightShoulder: {
     id: 'rightShoulder',
     name: 'Right Shoulder',
-    meshName: 'RightShoulder', // Will try variants: RightShoulder, ShoulderRight, R_Shoulder
+    meshName: 'RightShoulder',
     modelPath: '/models/parts/rightShoulder.glb',
     position: [0.4, 1.1, 0],
     color: '#e8e6e3',
@@ -52,7 +174,7 @@ export const bodyParts: Record<string, BodyPart> = {
   ribs: {
     id: 'ribs',
     name: 'Ribs',
-    meshName: 'Ribs', // Will try variants: Ribs, RibCage, Thorax
+    meshName: 'Ribs',
     modelPath: '/models/parts/ribs.glb',
     position: [0, 0.8, 0],
     color: '#e8e6e3',
@@ -62,14 +184,48 @@ export const bodyParts: Record<string, BodyPart> = {
 // Helper function to get mesh name variants for flexible matching
 export function getMeshNameVariants(bodyPartId: string): string[] {
   const variants: Record<string, string[]> = {
-    skull: ['Skull', ],
+    skull: ['Skull'],
     spine: ['Spine'],
     leftKnee: ['LeftKnee'],
     rightKnee: ['RightKnee'],
-    leftShoulder: ['LeftShoulder', ],
-    rightShoulder: ['RightShoulder', ],
-    ribs: ['Ribs',]
+    leftShoulder: ['LeftShoulder'],
+    rightShoulder: ['RightShoulder'],
+    ribs: ['Ribs'],
+    head: ['Head'],
+    orbit: ['Orbit', 'Eyes'],
+    neck: ['Neck'],
+    chest: ['Chest'],
+    'right-shoulder': ['RightShoulder'],
+    'right-arm': ['RightArm'],
+    'right-hand': ['RightHand'],
+    'left-shoulder': ['LeftShoulder'],
+    'left-arm': ['LeftArm'],
+    'left-hand': ['LeftHand'],
+    abdomen: ['Abdomen'],
+    'right-leg': ['RightLeg'],
+    'right-foot': ['RightFoot'],
+    'left-leg': ['LeftLeg'],
+    'left-foot': ['LeftFoot'],
   };
 
   return variants[bodyPartId] || [bodyParts[bodyPartId]?.meshName];
 }
+
+// Export array of all body part IDs from Human component
+export const humanBodyParts = [
+  'head',
+  'orbit',
+  'neck',
+  'chest',
+  'right-shoulder',
+  'right-arm',
+  'right-hand',
+  'left-shoulder',
+  'left-arm',
+  'left-hand',
+  'abdomen',
+  'right-leg',
+  'right-foot',
+  'left-leg',
+  'left-foot',
+];
