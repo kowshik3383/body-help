@@ -39,7 +39,7 @@ function Model({ modelPath }: { modelPath: string }) {
 
 export function BodyPartModel({ modelPath, bodyPartName }: BodyPartModelProps) {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-44">
       <Canvas
         camera={{ position: [0, 0, 3], fov: 50 }}
         shadows
@@ -62,10 +62,10 @@ export function BodyPartModel({ modelPath, bodyPartName }: BodyPartModelProps) {
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            minDistance={1}
-            maxDistance={10}
+            minDistance={7}
+            maxDistance={43}
             autoRotate={true}
-            autoRotateSpeed={2}
+            autoRotateSpeed={12}
           />
         </Suspense>
       </Canvas>

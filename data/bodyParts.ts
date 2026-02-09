@@ -122,7 +122,6 @@ export const bodyParts: Record<string, BodyPart> = {
     position: [-0.2, -1.4, 0],
     color: '#e8e6e3',
   },
-  // Legacy body parts (for backward compatibility with SkeletonViewer)
   skull: {
     id: 'skull',
     name: 'Skull',

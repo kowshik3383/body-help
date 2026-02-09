@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
     // Build context-aware prompt
     const systemPrompt = `You are a helpful medical assistant for the Body Help application. 

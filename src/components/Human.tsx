@@ -26,12 +26,12 @@ const Human = () => {
 	return (
 		<div className="human-wrapper">
 			{hoveredPart && (
-				<div className="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900/90 dark:bg-gray-800/90 text-white px-4 py-2 rounded-lg z-50 pointer-events-none text-sm font-semibold shadow-lg backdrop-blur-sm border border-gray-700">
+				<div className="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-900/90 dark:bg-gray-800/90 text-white px-4 py-2 rounded-lg z-50 pointer-events-none text-sm font-semibold shadow-lg backdrop-blur-sm border border-gray-700 ">
 					{formatPartName(hoveredPart)}
 				</div>
 			)}
 
-			<div className="human-body">
+			<div className="human-body scale-75">
 
 				<svg id="head" width="80.3" height="100" viewBox="0 0 181 250" fill="none" xmlns="http://www.w3.org/2000/svg"
 					onMouseEnter={() => setHoveredPart('head')} onMouseLeave={() => setHoveredPart("")}

@@ -1,28 +1,22 @@
+// Reference ChatPanel structure for proper height handling
+// Make sure your ChatPanel follows this pattern
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Mic, MicOff } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useChat } from '@/src/hooks/useChat';
-import { useLanguage } from '@/src/contexts/LanguageContext';
-import { useVoiceInput } from '@/src/hooks/useVoiceInput';
-import { ChatMessage } from './ChatMessage';
+import { motion } from 'framer-motion';
+import { Send, Loader2 } from 'lucide-react';
 
 interface ChatPanelProps {
   bodyPart: string;
 }
 
 export function ChatPanel({ bodyPart }: ChatPanelProps) {
-  const { language, content } = useLanguage();
-  const { messages, isLoading, sendMessage } = useChat(bodyPart, language);
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  
-  const { isListening, transcript, startListening, stopListening, clearTranscript, isSupported } = useVoiceInput(
-    language,
-    content.voiceCode
-  );
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,108 +26,128 @@ export function ChatPanel({ bodyPart }: ChatPanelProps) {
     scrollToBottom();
   }, [messages]);
 
-  // Update input when transcript changes
-  useEffect(() => {
-    if (transcript) {
-      setInput(transcript);
-    }
-  }, [transcript]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const message = input.trim();
+    const userMessage = input.trim();
     setInput('');
-    clearTranscript();
-    await sendMessage(message);
-    inputRef.current?.focus();
-  };
+    setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+    setIsLoading(true);
 
-  const handleVoiceToggle = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      clearTranscript();
-      setInput('');
-      startListening();
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage, bodyPart }),
+      });
+
+      const data = await response.json();
+      setMessages((prev) => [...prev, { role: 'ai', content: data.response }]);
+    } catch (error) {
+      console.error('Chat error:', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'ai', content: 'Sorry, I encountered an error. Please try again.' },
+      ]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const bodyPartContent = content.bodyParts[bodyPart];
-  const bodyPartName = bodyPartContent?.name || bodyPart;
-
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-emerald-50 dark:from-blue-900/20 dark:to-emerald-900/20">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-          {content.ui.askAbout} {bodyPartName}
-        </h3>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-        <AnimatePresence>
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
-        </AnimatePresence>
-
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm"
-          >
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span>{content.ui.aiThinking}</span>
-          </motion.div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <div className="flex gap-2">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={isListening ? content.ui.listening : content.ui.typeQuestion}
-            disabled={isLoading || isListening}
-            className="flex-1 px-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm disabled:opacity-50"
-          />
-          {isSupported && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              type="button"
-              onClick={handleVoiceToggle}
-              disabled={isLoading}
-              className={`px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                isListening
-                  ? 'bg-red-600 hover:bg-red-700 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200'
-              }`}
-              title={isListening ? content.ui.stopListening : content.ui.speakToType}
+    // CRITICAL: Use h-full and flex flex-col to ensure proper layout
+    <div className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-950 dark:to-gray-900/30">
+      {/* Messages Area - Must have flex-1 and overflow-auto */}
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center max-w-md px-4"
             >
-              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </motion.button>
-          )}
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
+                <span className="text-2xl sm:text-3xl">💬</span>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">
+                Ask me anything about {bodyPart}
+              </h3>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                I'm here to help answer your questions about this body part, conditions, and care.
+              </p>
+            </motion.div>
+          </div>
+        ) : (
+          <>
+            {messages.map((message, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'
+                  }`}
+                >
+                  <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap break-words">
+                    {message.content}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+            {isLoading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex justify-start"
+              >
+                <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md border border-gray-200 dark:border-gray-700">
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-blue-600" />
+                </div>
+              </motion.div>
+            )}
+            <div ref={messagesEndRef} />
+          </>
+        )}
+      </div>
+
+      {/* Input Area - Fixed at bottom, should NOT have flex-1 */}
+      <div className="flex-shrink-0 border-t border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl p-3 sm:p-4">
+        <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3">
+          <div className="flex-1 relative">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                }
+              }}
+              placeholder="Ask a question..."
+              rows={1}
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-none text-xs sm:text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[40px] sm:min-h-[44px] max-h-32 overflow-y-auto scrollbar-thin"
+              disabled={isLoading}
+            />
+          </div>
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex-shrink-0 px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl sm:rounded-2xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[40px] sm:min-w-[44px]"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </motion.button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

@@ -5,11 +5,12 @@ import { LanguageProvider } from "@/src/contexts/LanguageContext";
 import { ThemeProvider } from "@/src/contexts/ThemeContext";
 
 const urbanist = Urbanist({
-  subsets: ["latin"],
-  variable: "--font-urbanist",
-  display: "swap",
-  weight: ["300", "400", "500", "600", "700"],
+  subsets: ['latin'],
+  weight: ['400', '600', '700', '800'],
+  display: 'swap',
+  preload: true,
 });
+
 
 export const metadata: Metadata = {
   title: "Body Help - Interactive 3D Medical Visualization",
@@ -24,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${urbanist.variable} font-sans antialiased`}>
+      <body className={urbanist.className}>
         <ThemeProvider>
           <LanguageProvider>{children}</LanguageProvider>
         </ThemeProvider>
