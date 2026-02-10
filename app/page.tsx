@@ -38,40 +38,24 @@ export default function Home() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {/* Instructions Card */}
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="bg-white dark:bg-gray-900 border border-primary/20 rounded-xl p-6 shadow-sm transition-colors">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center transition-colors">
-                  <Info className="w-5 h-5 text-primary" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-primary mb-2">
-                  {content.ui.gettingStarted}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                  {content.ui.gettingStartedDesc}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+
 
         {/* Human Body Map */}
         <div className="flex items-center justify-center">
           <Human />
         </div>
+    
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-primary/20 mt-12 transition-colors">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <footer className="border-t border-primary/20 fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 z-50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <p className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Click on any body part to explore detailed medical information
+            {content.ui.gettingStartedDesc}
           </p>
         </div>
       </footer>
+
     </div>
   );
 }
