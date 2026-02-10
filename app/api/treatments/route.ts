@@ -3,13 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+import { getCached, setCached } from '@/src/utils/cache';
 
-// In-memory cache
-const treatmentCache = new Map<string, any>();
+const TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 export async function GET(request: NextRequest) {
   try {
     const disease = request.nextUrl.searchParams.get("disease");
+    const language = request.nextUrl.searchParams.get("language") || 'en';
 
     if (!disease) {
       return NextResponse.json(
@@ -25,10 +26,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 🔥 Cache check
-    if (treatmentCache.has(disease)) {
+    // 🔥 Cache check (persistent)
+    const cacheKey = `treatments:${disease}:${language}`;
+    const cached = await getCached<any>(cacheKey, TTL_MS);
+    if (cached) {
       return NextResponse.json({
-        treatments: treatmentCache.get(disease),
+        treatments: cached,
         cached: true,
       });
     }
@@ -54,6 +57,8 @@ Return strictly valid JSON:
 {
   "treatments": []
 }
+
+IMPORTANT: All human-readable fields (name, description) must be written in ${language} only. Do not use any other language.
 `;
 
     const result = await model.generateContent(prompt);
@@ -70,8 +75,8 @@ Return strictly valid JSON:
       throw new Error("Unexpected response structure");
     }
 
-    // 🔥 Save to cache
-    treatmentCache.set(disease, parsed.treatments);
+    // 🔥 Save to persistent cache
+    await setCached(cacheKey, parsed.treatments);
 
     return NextResponse.json({
       treatments: parsed.treatments,

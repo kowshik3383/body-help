@@ -3,12 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+import { getCached, setCached } from '@/src/utils/cache';
 
-// In-memory cache
-const diseaseCache = new Map<string, any>();
+const TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 export async function GET(request: NextRequest) {
   const bodyPart = request.nextUrl.searchParams.get("bodyPart");
+  const language = request.nextUrl.searchParams.get("language") || 'en';
 
   if (!bodyPart) {
     return NextResponse.json(
@@ -33,6 +34,12 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    const cacheKey = `diseases:${bodyPart}:${language}`;
+    const cached = await getCached<any>(cacheKey, TTL_MS);
+    if (cached) {
+      return NextResponse.json({ diseases: cached, cached: true, fallback: false });
+    }
+
     const prompt = `
 List the 5 most common diseases or medical conditions affecting the ${bodyPart}.
 
@@ -47,6 +54,8 @@ Return strictly valid JSON in this format:
 {
   "diseases": []
 }
+
+IMPORTANT: All human-readable fields (name, description, symptoms, causes) must be written in ${language} only. Do not use any other language.
 `;
 
     const result = await model.generateContent(prompt);
@@ -58,8 +67,7 @@ Return strictly valid JSON in this format:
       throw new Error("Unexpected response structure");
     }
 
-    // ✅ Save successful response to cache
-    diseaseCache.set(bodyPart, parsed.diseases);
+    await setCached(cacheKey, parsed.diseases);
 
     return NextResponse.json({
       diseases: parsed.diseases,
@@ -70,10 +78,12 @@ Return strictly valid JSON in this format:
   } catch (error: any) {
     console.error("Gemini diseases error:", error);
 
-    // 🔥 Fallback to cache if available
-    if (diseaseCache.has(bodyPart)) {
+    // 🔥 Fallback to cache if available (persistent)
+    const cacheKey = `diseases:${bodyPart}:${language}`;
+    const cached = await getCached<any>(cacheKey, TTL_MS);
+    if (cached) {
       return NextResponse.json({
-        diseases: diseaseCache.get(bodyPart),
+        diseases: cached,
         cached: true,
         fallback: true,
         message: "Returned cached data due to API error",

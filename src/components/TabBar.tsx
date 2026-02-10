@@ -27,8 +27,8 @@ export function TabBar({ activeTab, onTabChange }: TabBarProps) {
   ];
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="relative flex items-center gap-6 px-6 py-4 rounded-full bg-[#ECECEC] shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+      <div className="relative flex items-center gap-8 px-10 py-3 rounded-full bg-[#f6e3e3] shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           const Icon = tab.icon;
@@ -37,13 +37,13 @@ export function TabBar({ activeTab, onTabChange }: TabBarProps) {
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className="relative flex items-center justify-center"
+              className="relative flex items-center justify-center w-12 h-12"
             >
               {/* Animated active background */}
               {isActive && (
                 <motion.div
                   layoutId="active-pill"
-                  className="absolute w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-400 shadow-lg"
+                  className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-200 to-blue-400 shadow-lg"
                   transition={{
                     type: 'spring',
                     stiffness: 400,

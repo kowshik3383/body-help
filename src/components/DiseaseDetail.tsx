@@ -43,7 +43,7 @@ export function DiseaseDetail({
           <SpeechButton text={diseaseContent} className="flex-shrink-0" />
         </div>
 
-        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+        <p className="text-md sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">
           {disease.description}
         </p>
       </div>
@@ -84,7 +84,7 @@ export function DiseaseDetail({
             {disease.causes.map((cause, index) => (
               <li
                 key={index}
-                className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+                className="flex items-start gap-2 text-md text-gray-700 dark:text-gray-300"
               >
                 <span className="text-accent mt-1">•</span>
                 <span>{cause}</span>

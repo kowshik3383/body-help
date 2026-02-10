@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { getCached, setCached } from '@/src/utils/cache';
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+
+const TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,20 +19,27 @@ export async function POST(request: NextRequest) {
 
     const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
 
-    // Build context-aware prompt
-    const systemPrompt = `You are a helpful medical assistant for the Body Help application. 
+    // Persistent cache key (normalize message to reduce dupes)
+    const normMsg = String(message).trim().toLowerCase().replace(/\s+/g, ' ');
+    const lang = language || 'en';
+    const cacheKey = `chat:${bodyPart}:${lang}:${normMsg}`;
+
+    const cached = await getCached<{ response: string }>(cacheKey, TTL_MS);
+    if (cached) {
+      return NextResponse.json(cached);
+    }
+
+    // Build context-aware prompt in target language without fallback
+    const sysLang = lang;
+    const sysLangName = {
+      en: 'English', hi: 'Hindi', ta: 'Tamil', te: 'Telugu', kn: 'Kannada', ml: 'Malayalam', bn: 'Bengali', mr: 'Marathi', gu: 'Gujarati', pa: 'Punjabi', or: 'Odia', as: 'Assamese'
+    } as Record<string, string>;
+
+    const systemPrompt = `You are a helpful medical assistant for the Body Help application.
 You provide accurate, helpful, and easy-to-understand information about human anatomy and health.
 Current context: The user is asking about the ${bodyPart}.
-Language preference: ${language === 'hi' ? 'Hindi' : 'English'}
-${language === 'hi' ? 'Please respond in Hindi.' : 'Please respond in English.'}
-
-Guidelines:
-- Provide clear, concise, and medically accurate information
-- Use simple language that elderly users can understand
-- Be empathetic and supportive
-- If you don't know something, say so
-- Encourage users to consult healthcare professionals for serious concerns
-- Keep responses focused and under 200 words`;
+Language preference: ${sysLangName[sysLang] || 'English'}.
+Respond ONLY in ${sysLangName[sysLang] || 'English'}. Do not include any other language.`;
 
     // Format conversation history
     const historyText = conversationHistory
@@ -42,7 +52,10 @@ Guidelines:
     const response = await result.response;
     const text = response.text();
 
-    return NextResponse.json({ response: text });
+    const payload = { response: text };
+    await setCached(cacheKey, payload);
+
+    return NextResponse.json(payload);
   } catch (error) {
     console.error('Chat API error:', error);
     return NextResponse.json(
