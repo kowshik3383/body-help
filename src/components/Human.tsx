@@ -11,14 +11,21 @@ const Human = () => {
 		'left-shoulder', 'left-arm', 'left-hand', 'abdomen', 'right-leg', 'right-foot',
 		'left-leg', 'left-foot'
 	];
+	const enterFullscreen = () => {
+		if (document.documentElement.requestFullscreen) {
+			document.documentElement.requestFullscreen();
+		}
+	};
 
 	const handlePartClick = (partId: string) => {
+		enterFullscreen();
 		router.push(`/body-part/${partId}`);
 	};
 
+
 	// Format part name for display
 	const formatPartName = (part: string) => {
-		return part.split('-').map(word => 
+		return part.split('-').map(word =>
 			word.charAt(0).toUpperCase() + word.slice(1)
 		).join(' ');
 	};

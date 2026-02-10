@@ -4,37 +4,29 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-// Simple in-memory cache
+// In-memory cache
 const diseaseCache = new Map<string, any>();
 
 export async function GET(request: NextRequest) {
+  const bodyPart = request.nextUrl.searchParams.get("bodyPart");
+
+  if (!bodyPart) {
+    return NextResponse.json(
+      { error: "Missing bodyPart parameter" },
+      { status: 400 }
+    );
+  }
+
+  if (!process.env.GEMINI_API_KEY) {
+    return NextResponse.json(
+      { error: "Gemini API key not configured" },
+      { status: 500 }
+    );
+  }
+
   try {
-    const bodyPart = request.nextUrl.searchParams.get("bodyPart");
-
-    if (!bodyPart) {
-      return NextResponse.json(
-        { error: "Missing bodyPart parameter" },
-        { status: 400 }
-      );
-    }
-
-    if (!process.env.GEMINI_API_KEY) {
-      return NextResponse.json(
-        { error: "Gemini API key not configured" },
-        { status: 500 }
-      );
-    }
-
-    // 🔥 Return cached result if exists
-    if (diseaseCache.has(bodyPart)) {
-      return NextResponse.json({
-        diseases: diseaseCache.get(bodyPart),
-        cached: true,
-      });
-    }
-
     const model = genAI.getGenerativeModel({
-      model: 'gemini-3-flash-preview',
+      model: "gemini-2.5-flash-lite",
       generationConfig: {
         temperature: 0.4,
         responseMimeType: "application/json",
@@ -60,27 +52,33 @@ Return strictly valid JSON in this format:
     const result = await model.generateContent(prompt);
     const text = result.response.text();
 
-    let parsed;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      throw new Error("Invalid JSON returned from Gemini");
-    }
+    const parsed = JSON.parse(text);
 
     if (!parsed?.diseases || !Array.isArray(parsed.diseases)) {
       throw new Error("Unexpected response structure");
     }
 
-    // 🔥 Save to cache
+    // ✅ Save successful response to cache
     diseaseCache.set(bodyPart, parsed.diseases);
 
     return NextResponse.json({
       diseases: parsed.diseases,
       cached: false,
+      fallback: false,
     });
 
   } catch (error: any) {
     console.error("Gemini diseases error:", error);
+
+    // 🔥 Fallback to cache if available
+    if (diseaseCache.has(bodyPart)) {
+      return NextResponse.json({
+        diseases: diseaseCache.get(bodyPart),
+        cached: true,
+        fallback: true,
+        message: "Returned cached data due to API error",
+      });
+    }
 
     // Proper 429 handling
     if (error?.status === 429) {
@@ -91,7 +89,10 @@ Return strictly valid JSON in this format:
     }
 
     return NextResponse.json(
-      { error: "Failed to fetch diseases", message: error.message },
+      {
+        error: "Failed to fetch diseases",
+        message: error.message,
+      },
       { status: 500 }
     );
   }

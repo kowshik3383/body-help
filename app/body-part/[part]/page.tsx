@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Human from '@/src/components/Human';
 import { BodyPartModel } from '@/src/components/BodyPartModel';
 import { bodyParts } from '@/data/bodyParts';
+import ExerciseComponent from '@/src/components/ExerciseComponent';
 
 interface BodyPartPageProps {
   params: Promise<{ part: string }>;
@@ -33,7 +34,7 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
   const [loadingDiseases, setLoadingDiseases] = useState(true);
   const [loadingTreatments, setLoadingTreatments] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'diseases' | 'chat'>('diseases');
+  const [activeTab, setActiveTab] = useState<'diseases' | 'chat' | 'exercise'>('diseases');
   const [showModel, setShowModel] = useState(true);
 
   useEffect(() => {
@@ -42,26 +43,46 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
     const fetchDiseases = async () => {
       try {
         setLoadingDiseases(true);
+        setError(null);
+
         const response = await fetch(
           `/api/diseases?bodyPart=${encodeURIComponent(resolvedParams.part)}`,
           { signal: controller.signal }
         );
 
-        if (!response.ok) throw new Error('Failed to fetch diseases');
-
         const data = await response.json();
+
+        // Handle rate limit separately
+        if (response.status === 429) {
+          throw new Error("Too many requests. Please try again shortly.");
+        }
+
+        if (!response.ok) {
+          throw new Error(data?.error || "Failed to fetch diseases");
+        }
+
         setDiseases(data.diseases || []);
+
+        // Optional: show small UI indicator if fallback happened
+        if (data.fallback) {
+          console.warn("Using cached data due to API failure.");
+        }
+
       } catch (err: any) {
-        if (err.name !== 'AbortError') {
-          console.error('Error fetching diseases:', err);
+        if (err.name !== "AbortError") {
+          console.error("Error fetching diseases:", err);
           setError(err.message);
+          setDiseases([]); // clear stale UI state
         }
       } finally {
         setLoadingDiseases(false);
       }
     };
 
-    fetchDiseases();
+    if (resolvedParams.part) {
+      fetchDiseases();
+    }
+
     return () => controller.abort();
   }, [resolvedParams.part]);
 
@@ -145,7 +166,7 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
               <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-1" />
               <span className="hidden xs:inline font-medium text-sm sm:text-base">{content.ui.backToSkeleton}</span>
             </motion.button>
-            
+
             <motion.h1
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -153,7 +174,7 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
             >
               {bodyPartContent.name}
             </motion.h1>
-            
+
             <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2">
               <ColorThemeSelector />
               <LanguageSelector />
@@ -251,7 +272,7 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
                 </div>
               ) : (
                 <AnimatePresence mode="wait">
-                  {activeTab === 'diseases' ? (
+                  {activeTab === "diseases" ? (
                     <motion.div
                       key="diseases"
                       initial={{ opacity: 0, x: -20 }}
@@ -260,16 +281,23 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
                       transition={{ duration: 0.3 }}
                       className="h-full"
                     >
+                      {/* Existing Diseases UI (unchanged) */}
                       {selectedDisease ? (
                         <div className="p-3 sm:p-4 lg:p-6">
                           <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => setSelectedDisease(null)}
-                            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 text-blue-700 dark:text-blue-300 hover:from-blue-100 hover:to-purple-100 dark:hover:from-blue-900/30 dark:hover:to-purple-900/30 transition-all mb-4 sm:mb-5 lg:mb-6 group border border-blue-200/50 dark:border-blue-800/50"
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl 
+              bg-gradient-to-r from-blue-50 to-purple-50 
+              dark:from-blue-900/20 dark:to-purple-900/20
+              text-blue-700 dark:text-blue-300
+              transition-all mb-6"
                           >
-                            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:-translate-x-1" />
-                            <span className="font-medium text-xs sm:text-sm lg:text-base">{content.ui.backToConditions}</span>
+                            <ChevronLeft className="w-5 h-5" />
+                            <span className="font-medium text-sm">
+                              {content.ui.backToConditions}
+                            </span>
                           </motion.button>
 
                           <DiseaseDetail
@@ -393,7 +421,7 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
                                   >
                                     {/* Shine effect on hover */}
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                                    
+
                                     <div className="relative">
                                       <h3 className="font-bold text-gray-900 dark:text-white mb-1.5 sm:mb-2 text-xs sm:text-sm lg:text-base flex items-center gap-1.5 sm:gap-2">
                                         <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 group-hover:scale-150 transition-transform" />
@@ -410,6 +438,17 @@ export default function BodyPartPage({ params }: BodyPartPageProps) {
                           </motion.div>
                         </div>
                       )}
+                    </motion.div>
+                  ) : activeTab === "exercise" ? (
+                    <motion.div
+                      key="exercise"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="h-full overflow-y-auto p-3 sm:p-4 lg:p-6"
+                    >
+                      <ExerciseComponent bodyPart={resolvedParams.part} />
                     </motion.div>
                   ) : (
                     <motion.div
