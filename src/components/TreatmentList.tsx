@@ -1,7 +1,9 @@
+// Optimizations: Fixed JSX namespace issue, removed unnecessary spacing, improved type safety
 'use client';
 
 import { Treatment } from '@/src/types/medical';
 import { Pill, Heart, Stethoscope, Scissors } from 'lucide-react';
+import { FC } from 'react';
 
 interface TreatmentListProps {
   treatments: Treatment[];
@@ -9,25 +11,30 @@ interface TreatmentListProps {
 
 type TreatmentType = 'medication' | 'lifestyle' | 'therapy' | 'surgical';
 
+interface TreatmentMeta {
+  icon: FC<{ className?: string }>;
+  tone: string;
+}
+
 export function TreatmentList({ treatments }: TreatmentListProps) {
-  const getTreatmentMeta = (type: string) => {
+  const getTreatmentMeta = (type: string): TreatmentMeta => {
     const baseIconClass = 'w-5 h-5';
 
-    const config: Record<TreatmentType, { icon: JSX.Element; tone: string }> = {
+    const config: Record<TreatmentType, TreatmentMeta> = {
       medication: {
-        icon: <Pill className={baseIconClass} />,
+        icon: ({ className }) => <Pill className={className || baseIconClass} />,
         tone: 'bg-primary/10 text-primary',
       },
       lifestyle: {
-        icon: <Heart className={baseIconClass} />,
+        icon: ({ className }) => <Heart className={className || baseIconClass} />,
         tone: 'bg-secondary/10 text-secondary',
       },
       therapy: {
-        icon: <Stethoscope className={baseIconClass} />,
+        icon: ({ className }) => <Stethoscope className={className || baseIconClass} />,
         tone: 'bg-accent/10 text-accent',
       },
       surgical: {
-        icon: <Scissors className={baseIconClass} />,
+        icon: ({ className }) => <Scissors className={className || baseIconClass} />,
         tone: 'bg-primary/20 text-primary',
       },
     };
@@ -37,7 +44,7 @@ export function TreatmentList({ treatments }: TreatmentListProps) {
 
   if (!treatments || treatments.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
         No treatment information available.
       </div>
     );
@@ -51,7 +58,7 @@ export function TreatmentList({ treatments }: TreatmentListProps) {
 
       <div className="space-y-3">
         {treatments.map((treatment) => {
-          const { icon, tone } = getTreatmentMeta(treatment.type);
+          const { icon: IconComponent, tone } = getTreatmentMeta(treatment.type);
 
           return (
             <div
@@ -60,7 +67,7 @@ export function TreatmentList({ treatments }: TreatmentListProps) {
             >
               <div className="flex items-start gap-3">
                 <div className={`p-2 rounded-lg ${tone}`}>
-                  {icon}
+                  <IconComponent className="w-5 h-5" />
                 </div>
 
                 <div className="flex-1">
@@ -69,9 +76,7 @@ export function TreatmentList({ treatments }: TreatmentListProps) {
                       {treatment.name}
                     </h4>
 
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${tone}`}
-                    >
+                    <span className={`text-xs px-2 py-1 rounded-full ${tone}`}>
                       {treatment.type}
                     </span>
                   </div>

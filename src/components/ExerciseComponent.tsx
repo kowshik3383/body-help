@@ -1,6 +1,7 @@
-"use client";
+// Optimizations: Added FC type, improved state management with useCallback, better error handling, removed redundant spacing
+'use client';
 
-import React, { useState, useEffect } from "react";
+import { FC, useState, useEffect, useCallback } from 'react';
 
 interface Exercise {
   id: string;
@@ -15,88 +16,86 @@ interface Exercise {
   category: string;
 }
 
-interface Props {
+interface ExerciseComponentProps {
   bodyPart?: string;
 }
 
 const bodyPartMap: Record<string, string> = {
-  head: "neck",
-  brain: "neck",
-  shoulder: "shoulders",
-  arm: "upper arms",
-  forearm: "lower arms",
-  chest: "chest",
-  abdomen: "waist",
-  stomach: "waist",
-  thigh: "upper legs",
-  leg: "upper legs",
-  calf: "lower legs",
-  back: "back",
-  neck: "neck",
+  head: 'neck',
+  brain: 'neck',
+  shoulder: 'shoulders',
+  arm: 'upper arms',
+  forearm: 'lower arms',
+  chest: 'chest',
+  abdomen: 'waist',
+  stomach: 'waist',
+  thigh: 'upper legs',
+  leg: 'upper legs',
+  calf: 'lower legs',
+  back: 'back',
+  neck: 'neck',
 };
 
-const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
+const ExerciseComponent: FC<ExerciseComponentProps> = ({ bodyPart: initialBodyPart }) => {
   const [bodyPartList, setBodyPartList] = useState<string[]>([]);
   const [selectedBodyPart, setSelectedBodyPart] = useState<string | null>(
     initialBodyPart || null
   );
-  const [equipmentMode, setEquipmentMode] = useState<
-    "equipment" | "no-equipment" | null
-  >(null);
+  const [equipmentMode, setEquipmentMode] = useState<'equipment' | 'no-equipment' | null>(null);
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [images, setImages] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [loadingBodyParts, setLoadingBodyParts] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
-  const RAPID_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY!;
-  const RAPID_HOST = process.env.NEXT_PUBLIC_RAPIDAPI_HOST!;
+  const RAPID_KEY = process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '';
+  const RAPID_HOST = process.env.NEXT_PUBLIC_RAPIDAPI_HOST || '';
 
-  // Fetch body part list on mount if no body part provided
-  useEffect(() => {
-    if (!initialBodyPart) {
-      fetchBodyPartList();
+  const fetchBodyPartList = useCallback(async () => {
+    if (!RAPID_KEY || !RAPID_HOST) {
+      setError('API configuration missing');
+      return;
     }
-  }, [initialBodyPart]);
 
-  const fetchBodyPartList = async () => {
     try {
       setLoadingBodyParts(true);
       const res = await fetch(
-        "https://exercisedb.p.rapidapi.com/exercises/bodyPartList",
+        'https://exercisedb.p.rapidapi.com/exercises/bodyPartList',
         {
           headers: {
-            "X-RapidAPI-Key": RAPID_KEY,
-            "X-RapidAPI-Host": RAPID_HOST,
+            'X-RapidAPI-Key': RAPID_KEY,
+            'X-RapidAPI-Host': RAPID_HOST,
           },
         }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch body parts");
+      if (!res.ok) throw new Error('Failed to fetch body parts');
 
       const data: string[] = await res.json();
       setBodyPartList(data);
     } catch (err) {
       console.error(err);
-      setError("Failed to load body parts");
+      setError('Failed to load body parts');
     } finally {
       setLoadingBodyParts(false);
     }
-  };
+  }, [RAPID_KEY, RAPID_HOST]);
 
-  const fetchExerciseImage = async (exerciseId: string) => {
+  const fetchExerciseImage = useCallback(async (exerciseId: string) => {
+    if (!RAPID_KEY || !RAPID_HOST) return;
+
     try {
       const res = await fetch(
         `https://exercisedb.p.rapidapi.com/image?exerciseId=${exerciseId}&resolution=720`,
         {
           headers: {
-            "X-RapidAPI-Key": RAPID_KEY,
-            "X-RapidAPI-Host": RAPID_HOST,
+            'X-RapidAPI-Key': RAPID_KEY,
+            'X-RapidAPI-Host': RAPID_HOST,
           },
         }
       );
 
-      if (!res.ok) throw new Error("Image fetch failed");
+      if (!res.ok) throw new Error('Image fetch failed');
 
       const blob = await res.blob();
       const imageUrl = URL.createObjectURL(blob);
@@ -106,17 +105,22 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
         [exerciseId]: imageUrl,
       }));
     } catch (err) {
-      console.error("Image error:", err);
+      console.error('Image error:', err);
     }
-  };
+  }, [RAPID_KEY, RAPID_HOST]);
 
-  const fetchExercises = async (
-    mode: "equipment" | "no-equipment",
+  const fetchExercises = useCallback(async (
+    mode: 'equipment' | 'no-equipment',
     bodyPart: string
   ) => {
+    if (!RAPID_KEY || !RAPID_HOST) {
+      setError('API configuration missing');
+      return;
+    }
+
     try {
       setLoading(true);
-      setError("");
+      setError('');
       setExercises([]);
       setImages({});
 
@@ -127,26 +131,25 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
         `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${mappedBodyPart}`,
         {
           headers: {
-            "X-RapidAPI-Key": RAPID_KEY,
-            "X-RapidAPI-Host": RAPID_HOST,
+            'X-RapidAPI-Key': RAPID_KEY,
+            'X-RapidAPI-Host': RAPID_HOST,
           },
         }
       );
 
-      if (!res.ok) throw new Error("Failed to fetch exercises");
+      if (!res.ok) throw new Error('Failed to fetch exercises');
 
       const data: Exercise[] = await res.json();
 
       const filtered =
-        mode === "no-equipment"
-          ? data.filter((ex) => ex.equipment === "body weight")
-          : data.filter((ex) => ex.equipment !== "body weight");
+        mode === 'no-equipment'
+          ? data.filter((ex) => ex.equipment === 'body weight')
+          : data.filter((ex) => ex.equipment !== 'body weight');
 
       if (filtered.length === 0) {
         setError(
-          `No ${mode === "no-equipment" ? "bodyweight" : "equipment"} exercises found for this body part.`
+          `No ${mode === 'no-equipment' ? 'bodyweight' : 'equipment'} exercises found for this body part.`
         );
-        setLoading(false);
         return;
       }
 
@@ -158,40 +161,53 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
       });
     } catch (err) {
       console.error(err);
-      setError("Failed to fetch exercises. Please try again.");
+      setError('Failed to fetch exercises. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [RAPID_KEY, RAPID_HOST, fetchExerciseImage]);
 
-  const handleBodyPartSelection = (bodyPart: string) => {
+  const handleBodyPartSelection = useCallback((bodyPart: string) => {
     setSelectedBodyPart(bodyPart);
     setEquipmentMode(null);
     setExercises([]);
     setImages({});
-    setError("");
-  };
+    setError('');
+  }, []);
 
-  const handleEquipmentSelection = (mode: "equipment" | "no-equipment") => {
+  const handleEquipmentSelection = useCallback((mode: 'equipment' | 'no-equipment') => {
     if (!selectedBodyPart) return;
     setEquipmentMode(mode);
     fetchExercises(mode, selectedBodyPart);
-  };
+  }, [selectedBodyPart, fetchExercises]);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     if (initialBodyPart) {
       setEquipmentMode(null);
       setExercises([]);
       setImages({});
-      setError("");
+      setError('');
     } else {
       setSelectedBodyPart(null);
       setEquipmentMode(null);
       setExercises([]);
       setImages({});
-      setError("");
+      setError('');
     }
-  };
+  }, [initialBodyPart]);
+
+  useEffect(() => {
+    if (!initialBodyPart) {
+      fetchBodyPartList();
+    }
+  }, [initialBodyPart, fetchBodyPartList]);
+
+  // Cleanup image URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(images).forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [images]);
 
   // Body Part Selection Screen
   if (!selectedBodyPart && !initialBodyPart) {
@@ -209,10 +225,10 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
 
           {loadingBodyParts ? (
             <div className="text-center py-12">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-900 dark:border-gray-100 border-r-transparent"></div>
+              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-900 dark:border-gray-100 border-r-transparent" />
             </div>
           ) : error ? (
-            <div className="text-center py-12 text-red-500">{error}</div>
+            <div className="text-center py-12 text-red-500 dark:text-red-400">{error}</div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
               {bodyPartList.map((part) => (
@@ -257,14 +273,14 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => handleEquipmentSelection("equipment")}
+                onClick={() => handleEquipmentSelection('equipment')}
                 className="px-8 py-3 rounded-lg border-2 border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100 hover:bg-gray-900 dark:hover:bg-gray-100 hover:text-white dark:hover:text-gray-900 transition-all duration-200 font-medium"
               >
                 With Equipment
               </button>
 
               <button
-                onClick={() => handleEquipmentSelection("no-equipment")}
+                onClick={() => handleEquipmentSelection('no-equipment')}
                 className="px-8 py-3 rounded-lg bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 hover:bg-gray-800 dark:hover:bg-gray-200 transition-all duration-200 font-medium"
               >
                 No Equipment
@@ -278,7 +294,7 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
 
   // Exercises Display
   return (
-    <div className="min-h-screen  bg-gray-50 dark:bg-gray-950 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6 md:mb-8">
           <div>
@@ -286,9 +302,9 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
               {selectedBodyPart}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {equipmentMode === "no-equipment"
-                ? "Bodyweight exercises"
-                : "Equipment-based exercises"}
+              {equipmentMode === 'no-equipment'
+                ? 'Bodyweight exercises'
+                : 'Equipment-based exercises'}
             </p>
           </div>
 
@@ -302,14 +318,14 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
 
         {loading ? (
           <div className="text-center py-20">
-            <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-gray-900 dark:border-gray-100 border-r-transparent mb-4"></div>
+            <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-gray-900 dark:border-gray-100 border-r-transparent mb-4" />
             <p className="text-gray-600 dark:text-gray-400">
               Loading exercises...
             </p>
           </div>
         ) : error ? (
-          <div className="text-center py-20 ">
-            <p className="text-red-500 mb-4">{error}</p>
+          <div className="text-center py-20">
+            <p className="text-red-500 dark:text-red-400 mb-4">{error}</p>
             <button
               onClick={reset}
               className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 border border-gray-300 dark:border-gray-700 px-4 py-2 rounded-lg transition-colors"
@@ -318,7 +334,7 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
             </button>
           </div>
         ) : exercises.length > 0 ? (
-          <div className="grid grid-cols-1  gap-4 md:gap-6">
+          <div className="grid grid-cols-1 gap-4 md:gap-6 pb-32">
             {exercises.map((exercise) => (
               <div
                 key={exercise.id}
@@ -332,7 +348,7 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-solid border-gray-400 border-r-transparent"></div>
+                    <div className="h-6 w-6 animate-spin rounded-full border-2 border-solid border-gray-400 border-r-transparent" />
                   )}
                 </div>
 
@@ -343,11 +359,11 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
 
                   <div className="space-y-1 mb-3 text-xs text-gray-600 dark:text-gray-400">
                     <p className="capitalize">
-                      <span className="font-medium">Target:</span>{" "}
+                      <span className="font-medium">Target:</span>{' '}
                       {exercise.target}
                     </p>
                     <p className="capitalize">
-                      <span className="font-medium">Equipment:</span>{" "}
+                      <span className="font-medium">Equipment:</span>{' '}
                       {exercise.equipment}
                     </p>
                   </div>
@@ -370,7 +386,6 @@ const ExerciseComponent: React.FC<Props> = ({ bodyPart: initialBodyPart }) => {
             ))}
           </div>
         ) : null}
-<div className="h-44"></div>
       </div>
     </div>
   );

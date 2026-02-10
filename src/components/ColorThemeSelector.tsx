@@ -1,30 +1,40 @@
+// Optimizations: Added useCallback for event handlers, improved performance
 'use client';
 
 import { useTheme, colorPalettes } from '@/src/contexts/ThemeContext';
 import { Palette, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 export function ColorThemeSelector() {
   const { currentPaletteKey, setPalette } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
     }
+  }, []);
 
+  useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
+
+  const toggleDropdown = useCallback(() => {
+    setIsOpen((prev) => !prev);
   }, []);
+
+  const handlePaletteSelect = useCallback((key: string) => {
+    setPalette(key);
+    setIsOpen(false);
+  }, [setPalette]);
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className="flex items-center gap-2 px-3 py-2 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary transition-colors"
         aria-label="Select color theme"
       >
@@ -50,10 +60,7 @@ export function ColorThemeSelector() {
               {Object.entries(colorPalettes).map(([key, palette]) => (
                 <button
                   key={key}
-                  onClick={() => {
-                    setPalette(key);
-                    setIsOpen(false);
-                  }}
+                  onClick={() => handlePaletteSelect(key)}
                   className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors flex items-center justify-between gap-3 ${
                     currentPaletteKey === key
                       ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'

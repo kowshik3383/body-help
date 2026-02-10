@@ -1,6 +1,7 @@
+// Optimizations: Added useCallback for handlers, removed hardcoded mb-12, improved performance
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/src/contexts/LanguageContext';
@@ -10,13 +11,16 @@ interface ChatPanelProps {
   language?: string;
 }
 
+interface Message {
+  role: 'user' | 'ai';
+  content: string;
+}
+
 export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
   const { language: ctxLang } = useLanguage();
   const lang = language || ctxLang;
 
-  const [messages, setMessages] = useState<
-    Array<{ role: 'user' | 'ai'; content: string }>
-  >([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,14 +33,14 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
   }, [messages]);
 
   // Auto-resize textarea
-  const autoResize = () => {
+  const autoResize = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
     el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -56,6 +60,11 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
           conversationHistory: messages.slice(-10),
         }),
       });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch response');
+      }
+
       const data = await response.json();
       setMessages((prev) => [...prev, { role: 'ai', content: data.response }]);
     } catch (error) {
@@ -67,12 +76,22 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [input, isLoading, bodyPart, lang, messages]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  }, [handleSubmit]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    autoResize();
+  }, [autoResize]);
 
   return (
-    // ⚡ ROOT: flex column, full height, min-h-0 ensures textarea doesn't get hidden
     <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-950 dark:to-gray-900/30">
-      
       {/* Messages area */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
         {messages.length === 0 ? (
@@ -130,21 +149,13 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
       </div>
 
       {/* Input area */}
-      <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4 relative z-10">
+      <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4  sticky bottom-0 left-0 right-0 z-50">
         <form onSubmit={handleSubmit} className="flex gap-3 items-end">
           <textarea
             ref={textareaRef}
             value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              autoResize();
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
             placeholder="Ask a question..."
             rows={1}
             disabled={isLoading}

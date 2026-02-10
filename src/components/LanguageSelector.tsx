@@ -1,9 +1,10 @@
+// Optimizations: Added useCallback for event handlers, improved performance
 'use client';
 
 import { useLanguage } from '@/src/contexts/LanguageContext';
 import { Languages } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { languages } from '@/src/i18n';
 import { LanguageCode } from '@/src/types/language';
 
@@ -12,21 +13,30 @@ export function LanguageSelector() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
+  const handleClickOutside = useCallback((event: MouseEvent) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsOpen(false);
     }
+  }, []);
 
+  useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
+
+  const toggleDropdown = useCallback(() => {
+    setIsOpen((prev) => !prev);
   }, []);
+
+  const handleLanguageSelect = useCallback((code: LanguageCode) => {
+    setLanguage(code);
+    setIsOpen(false);
+  }, [setLanguage]);
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={toggleDropdown}
         className="flex items-center gap-2 px-3 py-2 sm:px-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:border-primary dark:hover:border-primary transition-colors"
         aria-label="Select language"
       >
@@ -48,10 +58,7 @@ export function LanguageSelector() {
             {Object.entries(languages).map(([code, lang]) => (
               <button
                 key={code}
-                onClick={() => {
-                  setLanguage(code as LanguageCode);
-                  setIsOpen(false);
-                }}
+                onClick={() => handleLanguageSelect(code as LanguageCode)}
                 className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                   language === code
                     ? 'bg-surface dark:bg-gray-700 text-primary font-medium'

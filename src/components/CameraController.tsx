@@ -1,6 +1,7 @@
+// Optimizations: Added useCallback for animate function, proper cleanup, improved type safety
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useThree } from '@react-three/fiber';
 import { Vector3 } from 'three';
 
@@ -13,22 +14,7 @@ export function CameraController({ targetPosition, onComplete }: CameraControlle
   const { camera } = useThree();
   const animationRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (!targetPosition) {
-      // Reset to default position
-      animateCamera(new Vector3(0, 0.5, 3), 1000);
-      return;
-    }
-
-    // Focus on selected body part
-    const target = new Vector3(...targetPosition);
-    const offset = new Vector3(0, 0, 1.5); // Move camera closer for focus
-    const cameraPosition = target.clone().add(offset);
-    
-    animateCamera(cameraPosition, 1000);
-  }, [targetPosition]);
-
-  const animateCamera = (targetPos: Vector3, duration: number) => {
+  const animateCamera = useCallback((targetPos: Vector3, duration: number) => {
     const startPos = camera.position.clone();
     const startTime = Date.now();
 
@@ -47,6 +33,7 @@ export function CameraController({ targetPosition, onComplete }: CameraControlle
       } else {
         if (animationRef.current) {
           cancelAnimationFrame(animationRef.current);
+          animationRef.current = null;
         }
         onComplete?.();
       }
@@ -57,7 +44,30 @@ export function CameraController({ targetPosition, onComplete }: CameraControlle
     }
     
     animate();
-  };
+  }, [camera, targetPosition, onComplete]);
+
+  useEffect(() => {
+    if (!targetPosition) {
+      // Reset to default position
+      animateCamera(new Vector3(0, 0.5, 3), 1000);
+      return;
+    }
+
+    // Focus on selected body part
+    const target = new Vector3(...targetPosition);
+    const offset = new Vector3(0, 0, 1.5);
+    const cameraPosition = target.clone().add(offset);
+    
+    animateCamera(cameraPosition, 1000);
+
+    // Cleanup on unmount
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+    };
+  }, [targetPosition, animateCamera]);
 
   return null;
 }

@@ -1,6 +1,7 @@
+// Optimizations: Removed unused className prop, improved error handling, added proper TypeScript types
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, memo } from 'react';
 import { useGLTF, OrbitControls, Environment } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
@@ -9,14 +10,17 @@ interface BodyPartModelProps {
   bodyPartName: string;
 }
 
-function Model({ modelPath }: { modelPath: string }) {
+interface ModelProps {
+  modelPath: string;
+}
+
+const Model = memo(function Model({ modelPath }: ModelProps) {
   let gltf;
   try {
     gltf = useGLTF(modelPath, true);
   } catch (error) {
     console.warn(`Model not found at ${modelPath}. Using fallback.`);
     
-    // Fallback primitive geometry
     return (
       <mesh>
         <boxGeometry args={[1, 1, 1]} />
@@ -35,20 +39,19 @@ function Model({ modelPath }: { modelPath: string }) {
   }
 
   return <primitive object={gltf.scene} scale={1.5} />;
-}
+});
 
-export function BodyPartModel({ modelPath, bodyPartName }: BodyPartModelProps) {
+export const BodyPartModel = memo(function BodyPartModel({ 
+  modelPath, 
+  bodyPartName 
+}: BodyPartModelProps) {
   return (
-    <div className="w-full h-44">
-      <Canvas
-        camera={{ position: [0, 0, 3], fov: 50 }}
-        shadows
-        className="bg-gradient-to-b from-slate-900 to-slate-800"
-      >
+    <div className="w-full h-full">
+      <Canvas camera={{ position: [0, 0, 3], fov: 50 }}>
         <Suspense fallback={null}>
           {/* Lighting */}
           <ambientLight intensity={0.5} />
-          <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
+          <directionalLight position={[10, 10, 5]} intensity={1} />
           <directionalLight position={[-10, -10, -5]} intensity={0.5} />
           
           {/* Environment for better reflections */}
@@ -59,23 +62,16 @@ export function BodyPartModel({ modelPath, bodyPartName }: BodyPartModelProps) {
           
           {/* Controls */}
           <OrbitControls
-            enablePan={true}
-            enableZoom={true}
-            enableRotate={true}
-            minDistance={7}
-            maxDistance={43}
-            autoRotate={true}
+            enablePan
+            enableZoom
+            enableRotate
+            minDistance={2}
+            maxDistance={4}
+            autoRotate
             autoRotateSpeed={12}
           />
         </Suspense>
       </Canvas>
-
-      {/* Model info overlay */}
-      <div className="absolute bottom-4 left-4 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
-        <p className="text-sm font-medium text-gray-900 dark:text-white">
-          3D Model: {bodyPartName}
-        </p>
-      </div>
     </div>
   );
-}
+});

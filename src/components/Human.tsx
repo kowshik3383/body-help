@@ -1,22 +1,13 @@
-"use client"
-import React, { useState } from 'react'
+'use client'
+// Optimizations: removed unused variables and fullscreen handler; memoized component for render stability.
+import React, { memo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 const Human = () => {
 	const router = useRouter();
 	const [hoveredPart, setHoveredPart] = useState("");
 
-	const bodyParts = [
-		'head', 'orbit', 'neck', 'chest', 'right-shoulder', 'right-arm', 'right-hand',
-		'left-shoulder', 'left-arm', 'left-hand', 'abdomen', 'right-leg', 'right-foot',
-		'left-leg', 'left-foot'
-	];
-	const enterFullscreen = () => {
-		if (document.documentElement.requestFullscreen) {
-			document.documentElement.requestFullscreen();
-		}
-	};
-
+	
 	const handlePartClick = (partId: string) => {
 		router.push(`/body-part/${partId}`);
 	};
@@ -202,4 +193,4 @@ const Human = () => {
 	)
 }
 
-export default Human
+export default memo(Human)

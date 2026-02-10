@@ -1,5 +1,7 @@
+// Optimizations: Added useMemo for speech content, improved performance
 'use client';
 
+import { useMemo } from 'react';
 import { Disease, Treatment } from '@/src/types/medical';
 import { TreatmentList } from './TreatmentList';
 import { Activity, AlertCircle, Loader2 } from 'lucide-react';
@@ -19,7 +21,7 @@ export function DiseaseDetail({
 }: DiseaseDetailProps) {
   const { content } = useLanguage();
 
-  const diseaseContent = `
+  const diseaseContent = useMemo(() => `
     ${disease.name}. 
     ${disease.description}
     ${content.ui.symptoms}: ${disease.symptoms.join(', ')}.
@@ -28,11 +30,10 @@ export function DiseaseDetail({
         ? `${content.ui.causes}: ${disease.causes.join(', ')}.`
         : ''
     }
-  `;
+  `, [disease, content.ui.symptoms, content.ui.causes]);
 
   return (
     <div className="space-y-4 sm:space-y-6">
-
       {/* Disease Header */}
       <div>
         <div className="flex items-start justify-between gap-4 mb-2">
