@@ -18,7 +18,6 @@ const Human = () => {
 	};
 
 	const handlePartClick = (partId: string) => {
-		enterFullscreen();
 		router.push(`/body-part/${partId}`);
 	};
 

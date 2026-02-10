@@ -1,43 +1,48 @@
-// Reference ChatPanel structure for proper height handling
-// Make sure your ChatPanel follows this pattern
-
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Loader2 } from 'lucide-react';
+import { useLanguage } from '@/src/contexts/LanguageContext';
 
 interface ChatPanelProps {
   bodyPart: string;
   language?: string;
 }
 
-import { useLanguage } from '@/src/contexts/LanguageContext';
-
 export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
   const { language: ctxLang } = useLanguage();
   const lang = language || ctxLang;
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([]);
+
+  const [messages, setMessages] = useState<
+    Array<{ role: 'user' | 'ai'; content: string }>
+  >([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Auto-resize textarea
+  const autoResize = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
-    setInput('');
     setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
+    setInput('');
     setIsLoading(true);
 
     try {
@@ -51,14 +56,13 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
           conversationHistory: messages.slice(-10),
         }),
       });
-
       const data = await response.json();
       setMessages((prev) => [...prev, { role: 'ai', content: data.response }]);
     } catch (error) {
       console.error('Chat error:', error);
       setMessages((prev) => [
         ...prev,
-        { role: 'ai', content: 'Sorry, I encountered an error. Please try again.' },
+        { role: 'ai', content: 'Something went wrong. Please try again.' },
       ]);
     } finally {
       setIsLoading(false);
@@ -66,25 +70,26 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
   };
 
   return (
-    // CRITICAL: Use h-full and flex flex-col to ensure proper layout
-    <div className="h-full flex flex-col bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-950 dark:to-gray-900/30">
-      {/* Messages Area - Must have flex-1 and overflow-auto */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700 scrollbar-track-transparent p-3 sm:p-4 lg:p-6 space-y-3 sm:space-y-4">
+    // ⚡ ROOT: flex column, full height, min-h-0 ensures textarea doesn't get hidden
+    <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-950 dark:to-gray-900/30">
+      
+      {/* Messages area */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
+          <div className="flex items-center justify-center h-full text-center px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-center max-w-md px-4"
+              className="max-w-md"
             >
-              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-lg">
-                <span className="text-2xl sm:text-3xl">💬</span>
+              <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <span className="text-2xl">💬</span>
               </div>
-              <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 Ask me anything about {bodyPart}
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                I'm here to help answer your questions about this body part, conditions, and care.
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                I'm here to help answer your questions.
               </p>
             </motion.div>
           </div>
@@ -95,66 +100,68 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
                 key={index}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                }`}
               >
                 <div
-                  className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md ${
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-md ${
                     message.role === 'user'
                       ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                       : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'
                   }`}
                 >
-                  <p className="text-sm sm:text-sm leading-loose whitespace-pre-wrap ">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
                     {message.content}
                   </p>
                 </div>
               </motion.div>
             ))}
             {isLoading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex justify-start"
-              >
+              <div className="flex justify-start">
                 <div className="bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-md border border-gray-200 dark:border-gray-700">
-                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-blue-600" />
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                 </div>
-              </motion.div>
+              </div>
             )}
             <div ref={messagesEndRef} />
           </>
         )}
       </div>
 
-      {/* Input Area - Fixed at bottom, should NOT have flex-1 */}
-      <div className="flex-shrink-0  border-t border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl p-3 sm:p-4">
-        <form onSubmit={handleSubmit} className="flex gap-2 sm:gap-3">
-          <div className="flex-1 relative">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                }
-              }}
-              placeholder="Ask a question..."
-              rows={1}
-              className="w-full px-3 sm:px-4 py-4 sm:py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl sm:rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-none text-sm sm:text-sm text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 min-h-[40px] sm:min-h-[44px] max-h-32 overflow-y-auto scrollbar-thin"
-              disabled={isLoading}
-            />
-          </div>
+      {/* Input area */}
+      <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4 relative z-10">
+        <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              autoResize();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
+            placeholder="Ask a question..."
+            rows={1}
+            disabled={isLoading}
+            className="flex-1 resize-none overflow-y-auto max-h-[120px] px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-900 dark:text-white placeholder-gray-500"
+          />
           <motion.button
             type="submit"
             disabled={!input.trim() || isLoading}
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex-shrink-0 px-3 sm:px-4 h-13 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white rounded-xl sm:rounded-2xl transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[40px] sm:min-w-[44px]"
+            whileHover={{ scale: 1.05 }}
+            className="flex-shrink-0 h-12 w-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl shadow-lg flex items-center justify-center"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Send className="w-5 h-5" />
+            )}
           </motion.button>
         </form>
       </div>
