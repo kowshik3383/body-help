@@ -27,6 +27,7 @@ export const kn: LanguageContent = {
     listen: 'ಕೇಳಿ',
     stop: 'ನಿಲ್ಲಿಸಿ',
     send: 'ಕಳುಹಿಸಿ',
+    back: 'ಹಿಂದೆ',
     backToSkeleton: 'ಸಂಪೂರ್ಣ ಅಸ್ಥಿಪಂಜರಕ್ಕೆ ಹಿಂತಿರುಗಿ',
     relatedConditions: 'ಸಂಬಂಧಿತ ಪರಿಸ್ಥಿತಿಗಳು',
     treatments: 'ಚಿಕಿತ್ಸೆಗಳು',

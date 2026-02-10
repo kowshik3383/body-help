@@ -41,7 +41,7 @@ export function DiseaseDetail({
             {disease.name}
           </h2>
 
-          <SpeechButton text={diseaseContent} className="flex-shrink-0" />
+          <SpeechButton text={diseaseContent} className="shrink-0" />
         </div>
 
         <p className="text-md sm:text-base text-gray-600 dark:text-gray-400 leading-relaxed">

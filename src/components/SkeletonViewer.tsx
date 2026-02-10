@@ -35,7 +35,7 @@ export function SkeletonViewer({ selectedBodyPart, onSelectBodyPart }: SkeletonV
       <Canvas
         camera={{ position: [0, 0.5, 3], fov: 50 }}
         shadows
-        className="bg-gradient-to-b from-slate-900 to-slate-800"
+        className="bg-linear-to-b from-slate-900 to-slate-800"
       >
         <Suspense fallback={<LoadingFallback />}>
           {/* Lighting */}

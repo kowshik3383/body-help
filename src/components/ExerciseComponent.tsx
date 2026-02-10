@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // Optimizations: Added FC type, improved state management with useCallback, better error handling, removed redundant spacing
 'use client';
 

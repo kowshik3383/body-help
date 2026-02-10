@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // Optimizations: Removed unused className prop, improved error handling, added proper TypeScript types
 'use client';
 

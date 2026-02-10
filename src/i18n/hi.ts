@@ -102,6 +102,7 @@ export const hi: LanguageContent = {
     listen: 'सुनें',
     stop: 'रोकें',
     send: 'भेजें',
+    back: 'वापस',
     backToSkeleton: 'पूर्ण कंकाल पर वापस जाएं',
     relatedConditions: 'संबंधित स्थितियां',
     treatments: 'उपचार',

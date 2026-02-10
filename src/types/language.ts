@@ -23,6 +23,7 @@ export interface UILabels {
   listen: string;
   stop: string;
   send: string;
+  back: string;
   backToSkeleton: string;
   relatedConditions: string;
   treatments: string;

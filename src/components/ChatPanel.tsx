@@ -91,7 +91,7 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
   }, [autoResize]);
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-gradient-to-br from-white to-gray-50/30 dark:from-gray-950 dark:to-gray-900/30">
+    <div className="flex flex-col h-full min-h-0 bg-linear-to-br from-white to-gray-50/30 dark:from-gray-950 dark:to-gray-900/30">
       {/* Messages area */}
       <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
         {messages.length === 0 ? (
@@ -101,14 +101,14 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
               animate={{ opacity: 1, y: 0 }}
               className="max-w-md"
             >
-              <div className="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <div className="w-14 h-14 bg-linear-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                 <span className="text-2xl">💬</span>
               </div>
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 Ask me anything about {bodyPart}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                I'm here to help answer your questions.
+                I&apos;m here to help answer your questions.
               </p>
             </motion.div>
           </div>
@@ -126,7 +126,7 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-3 shadow-md ${
                     message.role === 'user'
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+                      ? 'bg-linear-to-r from-blue-600 to-purple-600 text-white'
                       : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'
                   }`}
                 >
@@ -149,7 +149,7 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
       </div>
 
       {/* Input area */}
-      <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4  sticky bottom-0 left-0 right-0 z-50">
+      <div className="shrink-0 border-t border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-md p-4  sticky bottom-0 left-0 right-0 z-50">
         <form onSubmit={handleSubmit} className="flex gap-3 items-end">
           <textarea
             ref={textareaRef}
@@ -159,14 +159,14 @@ export function ChatPanel({ bodyPart, language }: ChatPanelProps) {
             placeholder="Ask a question..."
             rows={1}
             disabled={isLoading}
-            className="flex-1 resize-none overflow-y-auto max-h-[120px] px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-900 dark:text-white placeholder-gray-500"
+            className="flex-1 resize-none overflow-y-auto max-h-30 px-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-gray-900 dark:text-white placeholder-gray-500"
           />
           <motion.button
             type="submit"
             disabled={!input.trim() || isLoading}
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.05 }}
-            className="flex-shrink-0 h-12 w-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl shadow-lg flex items-center justify-center"
+            className="shrink-0 h-12 w-12 bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl shadow-lg flex items-center justify-center"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

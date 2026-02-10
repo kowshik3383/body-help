@@ -27,6 +27,7 @@ export const te: LanguageContent = {
     listen: 'వినండి',
     stop: 'ఆపండి',
     send: 'పంపండి',
+    back: 'వెనక్కి',
     backToSkeleton: 'పూర్తి అస్థిపంజరానికి తిరిగి వెళ్ళండి',
     relatedConditions: 'సంబంధిత పరిస్థితులు',
     treatments: 'చికిత్సలు',

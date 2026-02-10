@@ -51,7 +51,7 @@ export function ColorThemeSelector() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden z-50 min-w-[200px]"
+            className="absolute top-full mt-2 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl overflow-hidden z-50 min-w-50"
           >
             <div className="p-2">
               <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 px-3 py-2">

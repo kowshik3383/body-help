@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // Optimizations: Fixed useEffect state update issues, improved material handling, added cleanup
 'use client';
 

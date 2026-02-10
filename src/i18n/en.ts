@@ -102,6 +102,7 @@ export const en: LanguageContent = {
     listen: 'Listen',
     stop: 'Stop',
     send: 'Send',
+    back: 'Back',
     backToSkeleton: 'Back to Full Skeleton',
     relatedConditions: 'Related Conditions',
     treatments: 'Treatments',

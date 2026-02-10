@@ -27,6 +27,7 @@ export const ta: LanguageContent = {
     listen: 'கேளுங்கள்',
     stop: 'நிறுத்து',
     send: 'அனுப்பு',
+    back: 'திரும்பு',
     backToSkeleton: 'முழு எலும்புக்கூட்டுக்கு திரும்பு',
     relatedConditions: 'தொடர்புடைய நிலைமைகள்',
     treatments: 'சிகிச்சைகள்',
