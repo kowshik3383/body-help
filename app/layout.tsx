@@ -3,6 +3,7 @@ import { Urbanist } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/src/contexts/LanguageContext";
 import { ThemeProvider } from "@/src/contexts/ThemeContext";
+import { UserProvider } from "@/src/contexts/UserContext";
 
 const urbanist = Urbanist({
   subsets: ['latin'],
@@ -13,9 +14,9 @@ const urbanist = Urbanist({
 
 
 export const metadata: Metadata = {
-  title: "Body Help - Interactive 3D Medical Visualization",
+  title: "Diagnova - AI-Powered Medical Platform",
   description:
-    "Explore human anatomy in 3D. Learn about medical conditions, symptoms, and treatments for different body parts.",
+    "Your personal AI-powered health companion. Explore human anatomy, get personalized health insights in multiple languages.",
 };
 
 export default function RootLayout({
@@ -27,7 +28,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={urbanist.className}>
         <ThemeProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <UserProvider>{children}</UserProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

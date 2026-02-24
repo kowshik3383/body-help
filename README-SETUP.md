@@ -1,321 +1,276 @@
-# Body Help - 3D Medical Visualization System
+# Diagnova Setup Guide
 
-## Setup Instructions
+## Production-Grade AI-Powered Medical Platform
 
-### 1. Install Required Dependencies
+This guide will help you set up Diagnova, a multilingual medical platform with MongoDB integration, AI model rotation, and demographic-aware disease generation.
 
-The following packages need to be installed in the `body-help` directory:
+---
+
+## Prerequisites
+
+1. **Node.js** v20 or higher
+2. **pnpm** package manager
+3. **MongoDB** database (MongoDB Atlas recommended)
+4. **Google Gemini API Key**
+
+---
+
+## Installation Steps
+
+### 1. Install Dependencies
 
 ```bash
 cd body-help
-pnpm add @react-three/fiber @react-three/drei three @types/three @svgr/webpack
+pnpm install
 ```
 
-Or if using npm:
-
+**Note:** If `mongodb` is not installed, run:
 ```bash
-npm install @react-three/fiber @react-three/drei three @types/three @svgr/webpack
+pnpm add mongodb
 ```
 
-### 2. Add 3D Model Files (.glb)
+### 2. Set Up MongoDB
 
-Place your `.glb` model files in the `body-help/public/models/parts/` directory. The following files are expected:
+#### Option A: MongoDB Atlas (Recommended for Production)
 
-**Human Component Parts:**
-- `head.glb`
-- `orbit.glb`
-- `neck.glb`
-- `chest.glb`
-- `right-shoulder.glb`
-- `right-arm.glb`
-- `right-hand.glb`
-- `left-shoulder.glb`
-- `left-arm.glb`
-- `left-hand.glb`
-- `abdomen.glb`
-- `right-leg.glb`
-- `right-foot.glb`
-- `left-leg.glb`
-- `left-foot.glb`
+1. Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Create a free cluster
+3. Create a database user with read/write permissions
+4. Get your connection string (should look like):
+   ```
+   mongodb+srv://username:password@cluster.mongodb.net/diagnova?retryWrites=true&w=majority
+   ```
 
-**Legacy Skeleton Viewer Parts:**
-- `skull.glb`
-- `spine.glb`
-- `leftKnee.glb`
-- `rightKnee.glb`
-- `leftShoulder.glb`
-- `rightShoulder.glb`
-- `ribs.glb`
+#### Option B: Local MongoDB
 
-> **Note:** If a `.glb` file is missing, the system will display a fallback cube geometry instead.
+1. Install MongoDB locally
+2. Start MongoDB service
+3. Connection string:
+   ```
+   mongodb://localhost:27017/diagnova
+   ```
 
-### 3. Run the Development Server
+### 3. Get Google Gemini API Key
+
+1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Copy the key
+
+### 4. Configure Environment Variables
+
+1. Copy the example file:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+2. Edit `.env.local` and add your credentials:
+   ```env
+   MONGODB_URI=your_mongodb_connection_string_here
+   GEMINI_API_KEY=your_gemini_api_key_here
+   NODE_ENV=development
+   ```
+
+### 5. Run the Development Server
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the application.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Features Implemented
+---
 
-### ✅ Interactive Human Body Map
-- **2D SVG Human Component**: Click on any of 15 body parts to navigate to detailed view
-- **Body Parts Available**: head, orbit (eyes), neck, chest, shoulders (left/right), arms (left/right), hands (left/right), abdomen, legs (left/right), feet (left/right)
-- **Hover Effects**: Visual feedback when hovering over body parts
-- **Navigation**: Automatic routing to `/body-part/[part]` on selection
+## Features Overview
 
-### ✅ 3D Body Part Models
-- **Individual 3D Models**: Each body part can have its own detailed `.glb` 3D model
-- **Toggle View**: Switch between 2D body map and 3D model on the body part detail page
-- **Interactive Controls**: Rotate, zoom, and pan the 3D model
-- **Auto-rotation**: Models slowly rotate for better visualization
-- **Fallback Display**: Shows placeholder geometry if `.glb` file is missing
+### ✅ First-Time User Onboarding
 
-### ✅ 3D Skeleton Viewer (Legacy)
-- Interactive 3D skeleton with clickable body parts (skull, spine, knees, shoulders, ribs)
-- Smooth rotation, zoom, and pan controls using OrbitControls
-- Hover effects with emissive glow on body parts
+- **3-screen onboarding flow** with Framer Motion animations
+- Collects: Name, Age, Gender, Language, Health Goal
+- Saves to MongoDB with `onboarded` status
+- Premium gradient UI with step indicators
 
-### ✅ Body Part Selection
-- Click any body part to highlight it
-- Camera smoothly animates to focus on selected part
-- Visual connections between body parts for skeletal structure
+### ✅ MongoDB Integration
 
-### ✅ Disease Mapping
-- Each body part has associated medical conditions
-- Disease list displays when a body part is selected
-- Comprehensive disease information including:
-  - Name and description
-  - Symptoms
-  - Causes
-  - Related treatments
+- **Centralized connection utility** (`src/lib/mongodb.ts`)
+- **User Schema** with indexes on language, createdAt, onboarded
+- **Disease Cache Schema** with TTL index (24 hours)
+- Production-ready with connection pooling
 
-### ✅ Treatment Information
-- Multiple treatment types:
-  - 💊 Medication
-  - ❤️ Lifestyle
-  - 🩺 Therapy
-  - ✂️ Surgical
-- Color-coded treatment cards with icons
-- Detailed treatment descriptions
+### ✅ API Architecture (Next.js App Router)
 
-### ✅ UI/UX Features
-- Slide-out info panel with smooth animations
-- Dark mode support
-- Responsive design (mobile-friendly)
-- Loading states
-- Reset view button
-- Instructional overlay for first-time users
+- `POST /api/users` - Create user
+- `GET /api/users?id=xxx` - Get user by ID
+- `PATCH /api/users` - Update onboarding status
+- `GET /api/profile?userId=xxx` - Get profile
+- `PUT /api/profile` - Update profile
+- `GET /api/diseases` - Get diseases (with demographics)
 
-## Architecture
+### ✅ Demographic-Aware AI Prompts
 
-### Component Structure
-```
-app/
-├── page.tsx                     # Main page with SkeletonViewer
-├── body-part/
-│   └── [part]/
-│       └── page.tsx             # Individual body part detail page with 3D model
-├── components/
-│   ├── Human.tsx                # 2D SVG body map with clickable parts
-│   ├── BodyPartModel.tsx        # 3D model viewer for individual parts
-│   ├── SkeletonViewer.tsx       # 3D Canvas wrapper (legacy skeleton)
-│   ├── Skeleton3D.tsx           # Skeleton mesh & lighting
-│   ├── BodyPartMesh.tsx         # Individual clickable body parts
-│   ├── CameraController.tsx     # Camera animation handler
-│   ├── ChatPanel.tsx            # AI chat interface
-│   ├── DiseaseDetail.tsx        # Disease information display
-│   ├── TabBar.tsx               # Tab navigation component
-│   └── ...                      # Other UI components
-├── data/
-│   ├── bodyParts.ts             # Body parts configuration & .glb mappings
-│   ├── diseases.ts              # Disease database
-│   └── treatments.ts            # Treatment database
-├── types/
-│   └── medical.ts               # TypeScript interfaces
-└── hooks/
-    ├── useSelection.ts          # State management hook
-    ├── useChat.ts               # Chat functionality
-    └── useSpeech.ts             # Text-to-speech
-```
+Every disease request includes:
+- **Age** (e.g., 44)
+- **Gender** (male/female/other)
+- **Body Part** (e.g., knee)
+- **Language** (e.g., Hindi)
 
-### Data Structure
+AI prioritizes diseases relevant to the demographic. Example:
+- **Age 44, Female, Knee** → Osteoarthritis, Rheumatoid arthritis, Hormonal degeneration
 
-The system uses a normalized data structure for easy expansion:
+### ✅ AI Model Rotation
 
-- **Body Parts**: Map to diseases
-- **Diseases**: Map to treatments
-- **Treatments**: Categorized by type
+- **Model Pool**: `gemini-1.5-flash`, `gemini-1.5-pro`, `gemini-1.0-pro`, `gemini-1.5-flash-8b`
+- **Circular rotation** on every API call
+- **Auto-fallback** on 429 errors (rate limiting)
+- Prevents quota exhaustion
 
-## Expandability
+### ✅ Instant Multilingual Updates
 
-### Adding New Body Parts
+When language changes:
+1. **Global context updates**
+2. **Disease cache clears**
+3. **Custom event triggers** (`language-changed`)
+4. **Components re-fetch** in new language
 
-#### Step 1: Update the Human Component
-Edit `src/components/Human.tsx` and add your new body part to the `bodyParts` array:
+No stale translations!
 
-```typescript
-const bodyParts = [
-  'head', 'orbit', 'neck', 'chest', 
-  'right-shoulder', 'right-arm', 'right-hand',
-  'left-shoulder', 'left-arm', 'left-hand', 
-  'abdomen', 'right-leg', 'right-foot',
-  'left-leg', 'left-foot',
-  'new-body-part' // Add your new part here
-];
-```
+### ✅ MongoDB Caching Strategy
 
-Then add the corresponding SVG element with click and hover handlers.
+Before calling AI:
+1. Check MongoDB `disease_cache` collection
+2. Query by: `{age, gender, bodyPart, language}`
+3. If exists → return cached response
+4. Else → generate → store → return
 
-#### Step 2: Update Body Parts Data
-Edit `data/bodyParts.ts`:
+**TTL**: 24 hours (automatic expiration)
 
-```typescript
-'new-body-part': {
-  id: 'new-body-part',
-  name: 'New Body Part',
-  meshName: 'NewBodyPart',
-  modelPath: '/models/parts/new-body-part.glb',
-  position: [x, y, z], // 3D position for camera focus
-  color: '#e8e6e3',
-}
-```
+### ✅ Profile Management
 
-#### Step 3: Add 3D Model
-Place your `.glb` file at: `public/models/parts/new-body-part.glb`
+- **View**: Name, Age, Gender, Language, Health Goal, Account Created
+- **Edit**: Language, Health Goal
+- **Instant sync**: Changing language updates global context
+- Clean card-based UI
 
-#### Step 4: Add Internationalization (Optional)
-Update language files in `src/i18n/` to add translations for the new body part.
+### ✅ Navigation
 
-### Adding New Diseases
+New navbar items:
+- Home
+- Diseases
+- AI Chat
+- Map
+- **My Profile** (new!)
 
-Edit `data/diseases.ts`:
+---
 
-```typescript
-newDisease: {
-  id: 'newDisease',
-  name: 'Disease Name',
-  description: 'Detailed description',
-  symptoms: ['symptom1', 'symptom2'],
-  causes: ['cause1', 'cause2'],
-  treatments: ['treatmentId1', 'treatmentId2'],
-}
-```
-
-### Adding New Treatments
-
-Edit `data/treatments.ts`:
-
-```typescript
-newTreatment: {
-  id: 'newTreatment',
-  name: 'Treatment Name',
-  type: 'medication' | 'lifestyle' | 'therapy' | 'surgical',
-  description: 'Treatment details',
-}
-```
-
-## Current Data Coverage
-
-### Body Parts (22 total)
-
-**Human Component Parts (15)**
-- Head
-- Orbit (Eyes)
-- Neck
-- Chest
-- Right Shoulder
-- Right Arm
-- Right Hand
-- Left Shoulder
-- Left Arm
-- Left Hand
-- Abdomen
-- Right Leg
-- Right Foot
-- Left Leg
-- Left Foot
-
-**Legacy Skeleton Parts (7)**
-- Skull
-- Spine
-- Left Knee
-- Right Knee
-- Left Shoulder
-- Right Shoulder
-- Ribs
-
-### Diseases (15)
-- **Skull**: Migraine, Concussion, Sinusitis
-- **Spine**: Herniated Disc, Scoliosis, Spinal Stenosis
-- **Knee**: ACL Tear, Knee Osteoarthritis, Bursitis
-- **Shoulder**: Rotator Cuff Tear, Frozen Shoulder
-- **Ribs**: Fractured Rib, Costochondritis
-
-### Treatments (25+)
-- Medications (Ibuprofen, Antibiotics, NSAIDs, etc.)
-- Lifestyle changes (Rest, RICE protocol, Saline rinse, etc.)
-- Therapies (Physical therapy, Vestibular rehabilitation, etc.)
-- Surgical options (ACL reconstruction, Joint replacement, etc.)
-
-## Performance Optimizations
-
-- React Three Fiber for efficient 3D rendering
-- Lazy loading with Suspense
-- Memoized geometry calculations
-- Throttled raycasting for click detection
-- CSS-based animations with Framer Motion
-
-## Browser Compatibility
-
-- Chrome/Edge (recommended)
-- Firefox
-- Safari
-- Requires WebGL support
-
-## How It Works
-
-### User Flow
-
-1. **Home Page (`/`)**: Displays the full 3D skeleton viewer with clickable parts
-2. **Click on Human Component**: User clicks any of the 15 body parts in the SVG human map
-3. **Navigation**: Automatically routes to `/body-part/[part]` (e.g., `/body-part/head`)
-4. **Body Part Page**: Shows:
-   - **Left Panel**: Toggle between 2D body map and 3D model of the selected part
-   - **Right Panel**: Related medical information, diseases, and AI chat
-5. **3D Model Interaction**: Rotate, zoom, and pan the individual body part model
-
-### URL Routing
-
-- `/` - Home page with full skeleton
-- `/body-part/head` - Head detail page
-- `/body-part/right-arm` - Right arm detail page
-- `/body-part/[any-part]` - Dynamic route for any body part
-
-### Data Flow
+## Project Structure
 
 ```
-Human Component (SVG)
-    ↓ (click event)
-router.push('/body-part/[partId]')
-    ↓
-Body Part Page
-    ↓
-Loads: bodyParts[partId] from data/bodyParts.ts
-    ↓
-Displays: BodyPartModel with modelPath
-    ↓
-useGLTF(modelPath) loads .glb file from /public/models/parts/
+body-help/
+├── app/
+│   ├── api/
+│   │   ├── users/route.ts          # User CRUD
+│   │   ├── profile/route.ts        # Profile management
+│   │   ├── diseases/route.ts       # Demographic-aware diseases
+│   │   └── chat/route.ts           # AI chat
+│   ├── onboarding/page.tsx         # 3-screen onboarding
+│   ├── profile/page.tsx            # Profile page
+│   ├── layout.tsx                  # Root layout with providers
+│   └── page.tsx                    # Home (with onboarding check)
+├── src/
+│   ├── contexts/
+│   │   ├── UserContext.tsx         # User state management
+│   │   └── LanguageContext.tsx     # Language + cache clearing
+│   ├── lib/
+│   │   ├── mongodb.ts              # MongoDB connection
+│   │   ├── aiModelRotation.ts      # AI model rotation
+│   │   └── models/
+│   │       ├── User.ts             # User schema & methods
+│   │       └── DiseaseCache.ts     # Disease cache schema
+│   ├── types/
+│   │   └── user.ts                 # User types
+│   └── components/
+│       └── Navigation.tsx          # Top navigation
+└── .env.local                      # Environment variables (create this!)
 ```
 
-## Technologies Used
+---
 
-- **Framework**: Next.js 16 (App Router)
-- **3D Rendering**: React Three Fiber + Three.js
-- **3D Helpers**: @react-three/drei
-- **Animations**: Framer Motion
-- **Styling**: Tailwind CSS v4
-- **Icons**: Lucide React
-- **Language**: TypeScript
-- **AI Integration**: Google Generative AI & OpenAI
+## Architecture Highlights
+
+### Clean TypeScript Patterns
+
+- **No `any` types** (strict typing)
+- **Proper error handling** with try-catch
+- **HTTP method validation**
+- **Structured JSON responses**
+
+### Scalable Design
+
+- **Centralized DB connection** (singleton pattern)
+- **Model-based data access** (separation of concerns)
+- **Context-based state management**
+- **API route organization**
+
+### Production Best Practices
+
+- **Connection pooling** (MongoDB)
+- **Index optimization** (language, createdAt, TTL)
+- **Upsert operations** (avoid duplicates)
+- **Graceful error handling** (fallbacks, caching)
+- **Environment-based configuration**
+
+---
+
+## Premium UI Features
+
+- **Soft gradients** (blue-to-purple)
+- **Clean typography** (Urbanist font)
+- **Smooth transitions** (Framer Motion)
+- **No heavy borders**
+- **Mobile-first responsive**
+- **Apple-inspired design**
+
+---
+
+## Troubleshooting
+
+### MongoDB Connection Issues
+
+1. Check your connection string in `.env.local`
+2. Ensure IP whitelist in MongoDB Atlas
+3. Verify database user credentials
+
+### Gemini API Errors
+
+1. Verify API key is correct
+2. Check quota limits
+3. Model rotation will auto-fallback on 429 errors
+
+### Onboarding Not Showing
+
+1. Clear `localStorage` (key: `diagnova-user-id`)
+2. Restart dev server
+3. Check browser console for errors
+
+---
+
+## Next Steps
+
+1. **Test the onboarding flow**: Visit `/onboarding`
+2. **Create a user**: Complete the 3-step process
+3. **Explore diseases**: Select a body part
+4. **Edit profile**: Change language and see instant updates
+5. **Check MongoDB**: Verify data in `users` and `disease_cache` collections
+
+---
+
+## Support
+
+For issues or questions:
+- Check the [Next.js documentation](https://nextjs.org/docs)
+- Review [MongoDB Node.js Driver docs](https://www.mongodb.com/docs/drivers/node/)
+- Consult [Google Gemini API docs](https://ai.google.dev/docs)
+
+---
+
+**Diagnova** - Production-grade AI-powered multilingual medical platform.
+Built with ❤️ using Next.js 16, MongoDB, Google Gemini, and Framer Motion.
